@@ -20,7 +20,27 @@ app.get('/', (req, res) => {
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
-// Broadcast to all
+// Listen in on every WebSocket connection
+wss.on('connection', (ws) => {
+	console.log("\nDab for the new connection");
+
+	// When message is received from client
+	ws.on('message', (msg) => {
+	    var message = JSON.parse(msg);
+
+			console.log("\nFollowing message received from client:");
+	    console.log(message);
+
+			wss.broadcast(JSON.stringify(msg));
+	});
+
+	// Client disconnect
+	ws.on('close', (connection) => {
+		console.log('\nSomeone disconnected! :(');
+	});
+});
+
+// Broadcast message to all connected clients
 wss.broadcast = function broadcast(data) {
 	wss.clients.forEach(function each(client) {
 		if (client.readyState === WebSocket.OPEN) {
@@ -29,26 +49,6 @@ wss.broadcast = function broadcast(data) {
 	});
 };
 
-// Listen in on every connection
-wss.on('connection', (ws) => {
-    console.log("Dab for the new connection");
-
-    // When message is received
-    ws.on('message', (msg) => {
-        var message = JSON.parse(msg);
-
-				console.log("\n Following message received from client:");
-        console.log(message);
-
-				wss.broadcast(JSON.stringify(msg));
-    });
-
-		// Client disconnect
-		ws.on('close', (connection) => {
-  		console.log('Someone disconnected! :(');
-		});
-});
-
 server.listen(3000, () => {
-  console.log('Server listening on %d', server.address().port);
+	console.log('Server listening on %d', server.address().port);
 });

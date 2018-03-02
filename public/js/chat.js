@@ -18,7 +18,7 @@ $(function() {
     return false;
   });
 
-  // Incoming message passed from server
+  // Handle message passed from server
   ws.onmessage = (msg) => {
     try {
       var json = JSON.parse(msg.data);
