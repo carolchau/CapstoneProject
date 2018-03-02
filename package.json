@@ -1,0 +1,27 @@
+{
+  "name": "cappy",
+  "version": "1.0.0",
+  "description": "MMO game",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/carolchau/CapstoneProject.git"
+  },
+  "author": "Carol, Brian, Max, Cherin, Matthew",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/carolchau/CapstoneProject/issues"
+  },
+  "homepage": "https://github.com/carolchau/CapstoneProject#readme",
+  "dependencies": {
+    "ejs": "^2.5.7",
+    "express": "^4.16.2",
+    "nodemon": "^1.15.1",
+    "npm": "^5.7.1",
+    "ws": "^4.1.0"
+  }
+}
