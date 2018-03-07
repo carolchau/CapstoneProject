@@ -32,4 +32,8 @@ $(function() {
     $('#chat-history').append($('<li>').text(chatmsg));
   };
 
+  // Close WebSocket connection before window resources + documents are unloaded
+  window.addEventListener('beforeunload', function () {
+    ws.close();
+  });
 });
