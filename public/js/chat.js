@@ -33,7 +33,7 @@ $(function() {
   };
 
   // Close WebSocket connection before window resources + documents are unloaded
-  window.addEventListener('beforeunload', function () {
+  window.addEventListener('beforeunload', () => {
     ws.close();
   });
 });
