@@ -21,11 +21,11 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
 // Listen in on every WebSocket connection
-wss.on('connection', (ws) => {
+wss.on('connection', (client) => {
 	console.log("\nDab for the new connection");
 
 	// When message is received from client
-	ws.on('message', (msg) => {
+	client.on('message', (msg) => {
 	    var message = JSON.parse(msg);
 
 			console.log("\nFollowing message received from client:");
@@ -34,15 +34,20 @@ wss.on('connection', (ws) => {
 			wss.broadcast(JSON.stringify(msg));
 	});
 
+	// Error handling
+	client.on('error', (error) => {
+		console.log('\nAn Error has occurred:\n' + error);
+	});
+
 	// Client disconnect
-	ws.on('close', (connection) => {
+	client.on('close', (connection) => {
 		console.log('\nSomeone disconnected! :(');
 	});
 });
 
 // Broadcast message to all connected clients
-wss.broadcast = function broadcast(data) {
-	wss.clients.forEach(function each(client) {
+wss.broadcast = (data) => {
+	wss.clients.forEach((client) => {
 		if (client.readyState === WebSocket.OPEN) {
 			client.send(data);
 		}
