@@ -1,6 +1,17 @@
+PImage grass, path, sand, stone, water, snow, swamp, jungle;
+
 void setup() {
-  size(500,500);
+  size(720,720);
   loadPixels();
+  grass = loadImage("Grass.png");
+  path = loadImage("Path.png");
+  sand = loadImage("Sand.png");
+  stone = loadImage("Stone.png");
+  water = loadImage("Water.png");
+  snow = loadImage("Snow.png");
+  swamp = loadImage("Swamp.png");
+  jungle = loadImage("Jungle.png");
+  
   if (args == null) {
     println("Usage: $processing-java --sketch=gen_map --run argu moisture-freq moisture-pow temp-freq temp-pow sweetness-freq sweetness-pow");
     return;
@@ -49,6 +60,40 @@ void setup() {
     }
   }
   updatePixels();
+}
+
+void draw(){
+  
+  //checks the colour of the pixel beneath it and places a matching 16x16 block 
+  for ( int y = 0; y < height; y += 16) {
+    for ( int x = 0; x < width; x += 16) { 
+     color c = get(y, x);
+     // stone
+     if (c==color(255,255,0)) {
+        image(stone,y,x);
+      }
+      // dessert
+      else if (c==color(255,0,255)) {
+       image(sand,y,x);
+      }
+      // snow
+      else if (c==color(255,255,255)) {
+        image(snow,y,x);
+      }
+      // jungle
+      else if (c==color(0,255,255)) {
+        image(jungle,y,x);
+      }
+      // swamp
+      else if (c==color(0,0,0)) {
+        image(swamp,y,x);
+      }
+      // grass
+      else if(c==color(0,255,0)) {
+        image(grass,y,x);
+      }
+    }
+  }
 }
 
 // Generates a widthxheight noisemap
