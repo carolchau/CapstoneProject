@@ -14,7 +14,9 @@ app.use(express.static('public'));
 // Routes
 app.get('/', (req, res) => {
 	res.render('index.ejs');
-	//res.send('Hello World!');
+});
+app.get('/graphicstest', (req, res) => {
+	res.render('graphicstest.ejs');
 });
 
 const server = http.createServer(app);
