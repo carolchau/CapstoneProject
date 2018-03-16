@@ -10,12 +10,26 @@ $(function() {
   $('form').submit( () => {
     msg = $('#input_message').val();
     var data = {
+      type: "chat",
       source: "WebSocket Client App",
       message: msg
     };
     ws.send(JSON.stringify(data));
     $('#input_message').val('');
     return false;
+  });
+
+  // When arrow keys are pressed, send a message to the server
+  $(document).keydown(function(e){
+    if(e.keyCode == 37 || e.keyCode == 38 || e.keyCode == 39 || e.keyCode == 40){
+      var data = {
+        type: "position",
+        source: "WebSocket Client App",
+        position_x: 10,
+        position_y: 1
+      };
+      ws.send(JSON.stringify(data));
+    }
   });
 
   // Handle message passed from server
@@ -26,10 +40,20 @@ $(function() {
       console.log('Invalid JSON: ', msg.data);
       return;
     }
-    var chatmsg = JSON.parse(json).message;
-    console.log(chatmsg);
+    var passed_msg = JSON.parse(json);
 
-    $('#chat-history').append($('<li>').text(chatmsg));
+    if(passed_msg.type == "chat"){
+      var chatmsg = passed_msg.message;
+      $('#chat-history').append($('<li>').text(chatmsg));
+    }
+
+    else if(passed_msg.type == "position"){
+      var position_x = passed_msg.position_x;
+      var position_y = passed_msg.position_y;
+      console.log(position_x);
+      console.log(position_y);
+    }
+
   };
 
   // Close WebSocket connection before window resources + documents are unloaded
