@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Player Animation</title>
+    </head>
+    
+    <body>
+
+        <canvas id="Player Animation"></canvas>
+        <button onclick='moveUp()'>Up</button>
+        <button onclick='moveDown()'>Down</button>
+        <button onclick='moveLeft()'>Left</button>
+        <button onclick='moveRight()'>Right</button>
+
+        <script>
+            
+            //Dimensions of the canvas 
+            var canWidth  = 150;
+            var canHeight = 150;
+            
+            //x,y coordinates on the canvas
+            var x = 0;
+            var y = 0;
+            
+            //x,y source from the player sprite sheet 
+            var srcX = 0;
+            var srcY = 0;
+            
+            //Dimensions of the sprite sheet
+            var sheetWidth  = 60;
+            var sheetHeight = 65;
+            
+            //Number of rows & columns in the sprite sheet
+            var cols = 4;
+            var rows = 3;
+            
+            //Position of the given movement sprite on the sprie sheet
+            var trackDown  = 0;
+            var trackUp    = 1;
+            var trackLeft  = 2;
+            var trackRight = 3; 
+            
+            //Ititializing movement to the down animation by defalut
+            //****Will add idle later****
+            var up    = false;
+            var down  = true;
+            var left  = false;     
+            var right = false;
+            
+            //Speed of the player
+            var speed = 12;
+            
+            //Width & Height of the player
+            var width  = sheetWidth  / cols;
+            var height = sheetHeight / rows;
+            
+            //Initializing the frame's starting position
+            var currentFrame = 0;
+            
+            //Total number of frames for each animation 
+            var frameCount = 3;
+            
+            //Initializing the canvas
+            var canvas = document.getElementById("Player Animation");
+            canvas.width  = canWidth;
+            canvas.height = canHeight;
+            var ctx = canvas.getContext('2d');
+            
+            //Loading in the player image
+            var player = new Image();
+            player.src = "player sheet.png";
+            
+            //Main animation function, progresses the image frame by frame while moving it allong the canvas, depending on the direction of movement
+            function updateFrame(){
+                currentFrame = ++currentFrame % frameCount;
+                srcY = currentFrame * height;
+                ctx.clearRect(x,y,width,height);
+                
+                if(up && y>0){ 
+                     srcX = trackUp * width; 
+                     y-=speed; 
+                }
+                if(down && y<canHeight-30){
+                     srcX = trackDown * width;  
+                     y+=speed; 
+                }
+                if(left && x>0){ 
+                     srcX = trackLeft * width; 
+                     x-=speed; 
+                }
+                if(right && x<canWidth-28){
+                     srcX = trackRight * width;  
+                     x+=speed; 
+                }
+            }
+            
+            //Draws the player onto the canvas
+            function drawImage(){
+                updateFrame();
+                ctx.drawImage(player, srcX,srcY,width,height,x,y,width,height);
+            }
+
+            //Speed at which the animation progresses
+            setInterval(drawImage, 150);
+            
+            //Sets direction, depending on what button is pressed
+            function moveUp(){
+                up    = true;
+                down  = false;
+                left  = false;    
+                right = false; 
+            }
+            function moveDown(){
+                up    = false;
+                down  = true;
+                left  = false;     
+                right = false;  
+            }
+            function moveLeft(){
+                up    = false;
+                down  = false;
+                left  = true;    
+                right = false;  
+            }
+            function moveRight(){
+                up    = false;
+                down  = false;
+                left  = false;    
+                right = true; 
+            }
+            
+        </script>
+    </body>
+</html>
