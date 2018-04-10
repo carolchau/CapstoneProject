@@ -1,7 +1,7 @@
 //https://scotch.io/tutorials/easy-node-authentication-setup-and-local
 var express  = require('express');
-var app      = express();
-var port     = process.env.PORT || 3000;
+var app = express();
+var port = process.env.PORT || 3000;
 const http = require('http');
 const url = require('url');
 const WebSocket = require('ws');
@@ -9,34 +9,48 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 var mongoose = require('mongoose');
 var passport = require('passport');
-var flash    = require('connect-flash');
-var logger   = require('morgan');
+var flash = require('connect-flash');
+var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var session  = require('express-session');
+var session = require('express-session');
 
 var configDB = require('./config/database.js');
+// Connect to Database
+mongoose.connect(configDB.url, { useMongoClient: true });
 
-// configuration ===============================================================
-mongoose.connect(configDB.url, { useMongoClient: true }); // connect to our database
-// routes ======================================================================
+// Routes
 require('./config/passport')(passport);
 
-// set up our express application
+// Set up Express App
 app.use(logger('combined'));
-app.use(cookieParser());
+
+// BodyParser Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
-app.set('view engine', 'ejs'); // set up ejs for templating
+app.use(cookieParser());
+
+// Set Template Engine
+app.set('view engine', 'ejs');
+
+// Set Static Folder
 app.use(express.static('public'));
 
-// required for passport
-app.use(session({ resave: true, saveUninitialized: true, 
-	secret: 'testtesttesttesttesttest' })); // session secret
-app.use(passport.initialize());
-app.use(passport.session()); // persistent login sessions
-app.use(flash()); // use connect-flash for flash messages stored in session
+// Express Session
+app.use(session({
+	secret: 'testtesttesttesttesttest',
+	saveUninitialized: true,
+	resave: true
+}));
 
-require('./routes/routes.js')(app, passport); // load our routes and pass in our app and fully configured passport
+// Passport
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Connect-flash
+app.use(flash());
+
+// Load Routes
+require('./routes/routes.js')(app, passport);
 
 // Listen in on every WebSocket connection
 wss.on('connection', (ws) => {
@@ -66,6 +80,6 @@ wss.broadcast = function broadcast(data) {
 		}
 	});
 };
-// launch ======================================================================
+
 server.listen(port);
 console.log('The magic happens on port ' + port);
