@@ -22,13 +22,20 @@ $(function() {
         return false;
     });
 
-    // When arrow keys are pressed, send a message to the server
-    $(document).keydown(function(e){
-        if (e.keyCode == 37 || e.keyCode == 38 || e.keyCode == 39 || e.keyCode == 40){
-            var data = {type: "input", input: e.keyCode};
+    var key_map = {37: false, 38: false, 39: false, 40: false};
+    $(document).keydown(function(e) {
+        if (e.keyCode in key_map) {
+            key_map[e.keyCode] = true;
+            var data = {type: "input", left: key_map[37], up: key_map[38], right: key_map[39], down: key_map[40]};
             ws.send(JSON.stringify(data));
         }
+    }).keyup(function(e) {
+        if (e.keyCode in key_map) {
+            key_map[e.keyCode] = false;
+        }
     });
+
+
 
     // Handle message passed from server
     ws.onmessage = (msg) => {

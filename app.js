@@ -50,16 +50,16 @@ wss.on('connection', (client) => {
         var message = JSON.parse(msg);
 
         if(message.type == "input"){
-            if(message.input == 37){
+            if(message.left){
                 client.x_position-=5;
             }
-            else if(message.input == 38){
+            if(message.up){
                 client.y_position-=5;
             }
-            else if(message.input == 39){
+            if(message.right){
                 client.x_position+=5;
             }
-            else if(message.input == 40){
+            if(message.down){
                 client.y_position+=5;
             }
         }
