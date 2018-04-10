@@ -7,6 +7,17 @@ $(function() {
     console.log("Connected to server!");
   }
 
+	let chat_hidden = true;
+	$('#chat-history').click(function() {
+		if (!chat_hidden) {
+			$(this).height('5%');
+		}
+		else {
+			$(this).height('50%');
+		}
+		chat_hidden = !chat_hidden;
+	});
+
   $('form').submit( () => {
     msg = $('#input_message').val();
     var data = {
