@@ -48,7 +48,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			player.x = 32000;
 			player.y = 32000;
 
-			$.getJSON("js/graphics/gen.json", function(gen_json) {
+			$.getJSON("js/graphics/gen2k.json", function(gen_json) {
+				console.log('hello')
 				manager = new GameManager(ctx, canvas.width, canvas.height, gen_json, biomes, player);
 				manager.gen_around_player(start=true);
 				manager.start();
