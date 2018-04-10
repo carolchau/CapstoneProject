@@ -1,12 +1,14 @@
 //https://scotch.io/tutorials/easy-node-authentication-setup-and-local
-var express  = require('express');
-var app = express();
-var port = process.env.PORT || 3000;
+const express  = require('express');
+const app = express();
 const http = require('http');
 const url = require('url');
 const WebSocket = require('ws');
+
+var port = process.env.PORT || 3000;
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
+
 var mongoose = require('mongoose');
 var passport = require('passport');
 var flash = require('connect-flash');
@@ -52,23 +54,70 @@ app.use(flash());
 // Load Routes
 require('./routes/routes.js')(app, passport);
 
+//Variable to keep track of unique player indices
+var unique_counter = 0;
+
+setInterval(function() {
+	var data = {
+		type: "world_data"
+	};
+	for (let client of wss.clients) {
+		data[client.unique_id] = {x_position: client.x_position,
+		                         y_position: client.y_position};
+	}
+	wss.broadcast(JSON.stringify(data));
+}, 50);
+
 // Listen in on every WebSocket connection
-wss.on('connection', (ws) => {
-	console.log("\nDab for the new connection");
+wss.on('connection', (client) => {
+	console.log("Dab for the new connection \n");
+
+	client.unique_id = unique_counter;
+	client.x_position = 32000;
+	client.y_position = 32000;
+	var player_data = {
+		type: "id",
+		player_id: unique_counter
+	};
+	client.send(JSON.stringify(player_data));
+
+	unique_counter++;
 
 	// When message is received from client
-	ws.on('message', (msg) => {
-	    var message = JSON.parse(msg);
+	client.on('message', (msg) => {
+	  var message = JSON.parse(msg);
 
-			console.log("\nFollowing message received from client:");
+	  if(message.type == "input"){
+	      if(message.left){
+	          client.x_position-=5;
+	      }
+	      if(message.up){
+	          client.y_position-=5;
+	      }
+	      if(message.right){
+	          client.x_position+=5;
+	      }
+	      if(message.down){
+	          client.y_position+=5;
+	      }
+	  }
+	  else {
+	    console.log("Following message received from client: \n");
 	    console.log(message);
+	    wss.broadcast(msg);
+	  }
+	});
 
-			wss.broadcast(JSON.stringify(msg));
+	// Error handling
+	client.on('error', (error) => {
+	  console.log('An Error has occurred: \n' + error);
 	});
 
 	// Client disconnect
-	ws.on('close', (connection) => {
-		console.log('\nSomeone disconnected! :(');
+	client.on('close', (connection) => {
+	  var data = {type: "disconnect", player: client.unique_id}
+	  wss.broadcast(JSON.stringify(data));
+	  console.log('Player[' + client.unique_id + '] disconnected! :( \n');
 	});
 });
 
@@ -81,5 +130,6 @@ wss.broadcast = function broadcast(data) {
 	});
 };
 
-server.listen(port);
-console.log('The magic happens on port ' + port);
+server.listen(port, () => {
+	console.log('The magic happens on port ' + port);
+});
