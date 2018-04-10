@@ -2,7 +2,8 @@
 const WORLD_UNIT = 16;
 const WORLD_SIZE = 4000;  // in world units
 const CHUNK_SIZE = 1600;  // in px
-const GEN_IMG_SIZE = 500;  // in px
+const GEN_IMG_SIZE = 2000;  // in px
+const FPS = 1/24*1000;  // in millis
 
 var canvas = null, ctx = null, canvas_width = 0, canvas_height = 0;
 let offscreen_canvas = null, offscreen_ctx = null;
@@ -27,7 +28,7 @@ class GameManager {
 		this._chunks = {};
 	}
 
-	add_object(obj) { this._objects.push(obj); }
+	add_object(obj) { this._objects[obj.id] = obj; }
 
 	update () {
 		this.player.update();
@@ -39,6 +40,7 @@ class GameManager {
 		let num_of_chunks = object_keys.length;
 		for (let i = 0; i < num_of_chunks; i++) {
 			this._objects[object_keys[i]].update();
+			//console.log(this._objects[object_keys[i]].x, this._objects[object_keys[i]].y)
 		}
 	}
 
@@ -66,10 +68,15 @@ class GameManager {
 		this.player.draw(this._ctx, this.viewrect_x, this.viewrect_y);
 	}
 
+	main_loop () {
+			this.update();
+			this.draw();
+	}
+
 	start () {
 		this.player.play_anim('idle_s');
-		this.update();
-		this.draw();
+		var _this = this;
+		setInterval(function() {_this.main_loop()}, FPS);
 	}
 
 	gen_around_player (start=false) {
@@ -79,22 +86,20 @@ class GameManager {
 		let x_left_chunk = Math.floor(x_left/CHUNK_SIZE), y_top_chunk = Math.floor(y_top/CHUNK_SIZE);
 		let x_right_chunk = Math.ceil(x_right/CHUNK_SIZE), y_bot_chunk = Math.ceil(y_bot/CHUNK_SIZE);
 		let x_range = x_right_chunk - x_left_chunk, y_range = y_bot_chunk - y_top_chunk;
-		console.log(x_range, y_range);
 		for (let i = 0; i < x_range; i++) {
 			for (let j = 0; j < y_range; j++) {
+				let chunk_id_x = x_left_chunk + i, chunk_id_y = y_top_chunk + j;
 				let ch_x_left = x_left + i*CHUNK_SIZE;
 				let ch_y_top = y_top + j*CHUNK_SIZE;
 
-				if (this._chunks[ch_x_left.toString() + ',' + ch_y_top.toString()] == null) {
+				if (this._chunks[chunk_id_x.toString() + ',' + chunk_id_y.toString()] == null) {
 					let chunk = new WorldChunk(this._gen_key, this._biomes);
 					console.log('new chunk:',ch_x_left, ch_y_top);
 					chunk.gen(ch_x_left, ch_y_top);
-					this._chunks[ch_x_left.toString() + ',' + ch_y_top.toString()] = chunk;
+					this._chunks[chunk_id_x.toString() + ',' + chunk_id_y.toString()] = chunk;
 				}
 			}
 		}
-		if (start)
-			this.start();
 	}
 }
 
@@ -173,8 +178,9 @@ class AnimatedObject extends GameObject {
 		super(id);
 		this._sprite_change_time = null;
 		this._current_sprite = [];  // tuple of animation name, current frame number
-		this._x_speed = 0;
-		this._y_speed = 0;
+		this._last_x_pos = this._x;
+		this._last_y_pos = this._y;
+		this._anim = null;
 	}
 
 	get x_speed () { return this._x_speed; }
@@ -203,10 +209,11 @@ class AnimatedObject extends GameObject {
 	}
 
 	play_anim (anim_name) {
+		clearInterval(this._anim);
 		this._current_sprite[0] = anim_name;
 		this._current_sprite[1] = 0;
 		if (this._sprites[anim_name].length != 1) {
-			setInterval(() => {
+			this._anim = setInterval(() => {
 				this._current_sprite[1] = ++this._current_sprite[1] % this._sprites[anim_name].length;
 			}, this._sprite_change_time);
 		}
@@ -216,6 +223,63 @@ class AnimatedObject extends GameObject {
 		ctx.drawImage(
 			this._sprites[this._current_sprite[0]][this._current_sprite[1]],
 			this._x - ctx_left, this._y - ctx_top);
+	}
+}
+
+
+class Player extends AnimatedObject {
+	constructor (id) {
+		super(id);
+		this._idle = true;
+	}
+
+	update () {
+		super.update();
+		if (this._last_x_pos < this._x) {
+			this.play_anim('walk_e');
+			this._idle = false;
+		}
+		else if (this._last_x_pos > this._x) {
+			this.play_anim('walk_w');
+			this._idle = false;
+		}
+		else if (this._last_y_pos < this._y) {
+			this.play_anim('walk_s');
+			this._idle = false;
+		}
+		else if (this._last_y_pos > this._y) {
+			this.play_anim('walk_n');
+			this._idle = false;
+		}
+
+		if (this._last_x_pos == this._x && this._last_y_pos == this._y && !this._idle) {
+			if (this._current_sprite[0] == 'walk_n') {
+				this.play_anim('idle_n');
+				this._idle = true;
+			}
+			else if (this._current_sprite[0] == 'walk_s') {
+				this.play_anim('idle_s');
+				this._idle = true;
+			}
+			else if (this._current_sprite[0] == 'walk_w') {
+				this.play_anim('idle_w');
+				this._idle = true;
+			}
+			else if (this._current_sprite[0] == 'walk_e') {
+				this.play_anim('idle_e');
+				this._idle = true;
+			}
+		}
+		this._last_x_pos = this._x;
+		this._last_y_pos = this._y;
+	}
+
+	load_animation (anim_name, img_names, animation_length) {
+		if (anim_name != 'idle_n' && anim_name != 'idle_s' &&
+				anim_name != 'idle_w' && anim_name != 'idle_e' &&
+				anim_name != 'walk_n' && anim_name != 'walk_s' &&
+				anim_name != 'walk_w' && anim_name != 'walk_e') return;
+		super.load_animation(anim_name, img_names, animation_length);
 	}
 }
 

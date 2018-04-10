@@ -4,13 +4,13 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		canvas.height = window.innerHeight;
 		ctx = canvas.getContext('2d');
 
-		let manager = null;
-		let player = null;
+		player = new Player('player');
+		manager = null;
 
 		asset_manager = new AssetManager();
 		img_list = ['img/Grass.png', 'img/Sand.png', 'img/Snow.png',
 								'img/Swamp.png', 'img/Jungle.png', 'img/Water.png'];
-		player_stand_n = ['img/Player/standS.png'];
+		player_stand_n = ['img/Player/standN.png'];
 		player_stand_s = ['img/Player/standS.png'];
 		player_stand_w = ['img/Player/standW.png'];
 		player_stand_e = ['img/Player/standE.png'];
@@ -37,7 +37,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			biomes['water'] = new StaticObject(0);
 			biomes['water'].load_sprite('img/Water.png');
 
-			player = new AnimatedObject('player');
 			player.load_animation('idle_n', player_stand_n, 0);
 			player.load_animation('idle_s', player_stand_s, 0);
 			player.load_animation('idle_w', player_stand_w, 0);
@@ -52,6 +51,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			$.getJSON("js/graphics/gen.json", function(gen_json) {
 				manager = new GameManager(ctx, canvas.width, canvas.height, gen_json, biomes, player);
 				manager.gen_around_player(start=true);
+				manager.start();
 			});
 		});
 
@@ -59,7 +59,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     var client_id = -1;
 
     // Make WebSocket connection
-    var ws = new WebSocket('ws://localhost:3000');
+    var ws = new WebSocket('ws://4ca4295a.ngrok.io');
 
     // When connection is made
     ws.onopen = () => {
@@ -114,28 +114,35 @@ document.addEventListener("DOMContentLoaded", function(event) {
             $('#chat-history').append($('<li>').text("Player_" + message.player + ": " + chatmsg));
         }
 				else if (message.type == "world_data") {
-					player_keys = Object.keys(message);
-					num_of_players = player_keys.length;
-					for (let i = 0; i < num_of_players; i++) {
-						let id = 'player_'+player_keys[i]
-						if (player_keys[i] == client_id) {
-							player.x = message[client_id].x_position;
-							player.y = message[client_id].y_position;
-						}
-						else {
-							if (manager._objects[id] == null) {
-								let new_player = new AnimatedObject(id);
-								new_player.load_animation('idle_n', player_stand_n, 0);
-								new_player.load_animation('idle_s', player_stand_s, 0);
-								new_player.load_animation('idle_w', player_stand_w, 0);
-								new_player.load_animation('idle_e', player_stand_e, 0);
-								new_player.load_animation('walk_n', player_walk_n, 5);
-								new_player.load_animation('walk_s', player_walk_s, 5);
-								new_player.load_animation('walk_w', player_walk_w, 5);
-								new_player.load_animation('walk_e', player_walk_e, 5);
-								new_player.x = message[player_keys[i]].x_position;
-								new_player.y = message[player_keys[i]].y_position;
-								manager.add_object(new_player);
+					if (manager != null) {
+						player_keys = Object.keys(message);
+						num_of_players = player_keys.length;
+						for (let i = 0; i < num_of_players; i++) {
+							let id = 'player_'+player_keys[i]
+							if (player_keys[i] == 'type') continue;
+							if (player_keys[i] == client_id) {
+								player.x = message[client_id].x_position;
+								player.y = message[client_id].y_position;
+							}
+							else {
+								if (manager._objects[id] == null) {
+									let new_player = new Player(id);
+									new_player.load_animation('idle_n', player_stand_n, 0);
+									new_player.load_animation('idle_s', player_stand_s, 0);
+									new_player.load_animation('idle_w', player_stand_w, 0);
+									new_player.load_animation('idle_e', player_stand_e, 0);
+									new_player.load_animation('walk_n', player_walk_n, 5);
+									new_player.load_animation('walk_s', player_walk_s, 5);
+									new_player.load_animation('walk_w', player_walk_w, 5);
+									new_player.load_animation('walk_e', player_walk_e, 5);
+									new_player.x = message[player_keys[i]].x_position;
+									new_player.y = message[player_keys[i]].y_position;
+									manager.add_object(new_player);
+								}
+								else {
+									manager._objects[id].x = message[player_keys[i]].x_position;
+									manager._objects[id].y = message[player_keys[i]].y_position;
+								}
 							}
 						}
 					}
@@ -143,7 +150,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
         else if (message.type == "id"){
             client_id = message.player_id;
-						player.id = client_id;
+						player.id = 'player_' + client_id;
         }
     };
 
@@ -151,6 +158,4 @@ document.addEventListener("DOMContentLoaded", function(event) {
     window.addEventListener('beforeunload', () => {
         ws.close();
     });
-
-
 });

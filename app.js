@@ -34,7 +34,7 @@ setInterval(function(){
                                    y_position: client.y_position};
     }
     wss.broadcast(JSON.stringify(data));
-}, 500);
+}, 50);
 
 // Listen in on every WebSocket connection
 wss.on('connection', (client) => {
