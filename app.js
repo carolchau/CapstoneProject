@@ -77,6 +77,8 @@ wss.on('connection', (client) => {
 
     // Client disconnect
     client.on('close', (connection) => {
+        var data = {type: "disconnect", player: client.unique_id}
+        wss.broadcast(JSON.stringify(data));
         console.log('Player[' + client.unique_id + '] disconnected! :( \n');
     });
 });

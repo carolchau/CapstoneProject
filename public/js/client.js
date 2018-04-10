@@ -60,6 +60,10 @@ $(function() {
             console.log(position_x);
             console.log(position_y);
         }
+        else if (message.type == "disconnect"){
+            var player_to_drop = message.player;
+            //drop_from_game_objects(player_to_frop);
+        }
         else if (message.type == "id"){
             client_id = message.player_id;
         }
