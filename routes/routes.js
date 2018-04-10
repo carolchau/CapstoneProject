@@ -1,5 +1,4 @@
 module.exports = function(app, passport) {
-
 	// Home page
 	app.get('/', function(req, res) {
 		res.render('home.ejs'); // load the home.ejs file
@@ -12,7 +11,7 @@ module.exports = function(app, passport) {
 	app.post('/login', passport.authenticate('local-login', {
 		successRedirect : '/index',
 		failureRedirect : '/login',
-		failureFlash : true 
+		failureFlash : true
 	}));
 
 	// Signup
@@ -23,11 +22,11 @@ module.exports = function(app, passport) {
 	// Process the signup form
 	app.post('/signup', passport.authenticate('local-signup', {
 		successRedirect : '/index',
-		failureRedirect : '/signup', 
+		failureRedirect : '/signup',
 		failureFlash : true
 	}));
 
-	// Profile section 
+	// Profile section
 	app.get('/index', isLoggedIn, function(req, res) {
 		res.render('index.ejs', {
 			user : req.user
