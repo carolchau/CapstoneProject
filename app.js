@@ -20,42 +20,80 @@ app.get('/graphicstest', (req, res) => {
 });
 
 const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
+const wss = new WebSocket.Server({
+    server
+});
+
+//Variable to keep track of unique player indices
+var unique_counter = 0;
+
+setInterval(function(){
+    var data = {type: "world_data"}
+    for (let client of wss.clients) {
+         data[client.unique_id] = {x_position: client.x_position,
+                                   y_position: client.y_position};
+    }
+    wss.broadcast(JSON.stringify(data));
+}, 500);
 
 // Listen in on every WebSocket connection
 wss.on('connection', (client) => {
-	console.log("\nDab for the new connection");
+    console.log("Dab for the new connection \n");
 
-	// When message is received from client
-	client.on('message', (msg) => {
-	    var message = JSON.parse(msg);
+    client.unique_id = unique_counter;
+    client.x_position = 32000;
+    client.y_position = 32000;
+    var player_data = {type: "id", player_id: unique_counter};
+    client.send(JSON.stringify(player_data));
 
-			console.log("\nFollowing message received from client:");
-	    console.log(message);
+    unique_counter++;
 
-			wss.broadcast(JSON.stringify(msg));
-	});
+    // When message is received from client
+    client.on('message', (msg) => {
+        var message = JSON.parse(msg);
 
-	// Error handling
-	client.on('error', (error) => {
-		console.log('\nAn Error has occurred:\n' + error);
-	});
+        if(message.type == "input"){
+            if(message.input == 37){
+                client.x_position-=5;
+            }
+            else if(message.input == 38){
+                client.y_position-=5;
+            }
+            else if(message.input == 39){
+                client.x_position+=5;
+            }
+            else if(message.input == 40){
+                client.y_position+=5;
+            }
+        }
+        else{
+        console.log("Following message received from client: \n");
+        console.log(message);
+        wss.broadcast(msg);
+        }
+    });
 
-	// Client disconnect
-	client.on('close', (connection) => {
-		console.log('\nSomeone disconnected! :(');
-	});
+    // Error handling
+    client.on('error', (error) => {
+        console.log('An Error has occurred: \n' + error);
+    });
+
+    // Client disconnect
+    client.on('close', (connection) => {
+        console.log('Player  disconnected! :( \n');
+        console.log(client.unique_id);
+    });
 });
 
 // Broadcast message to all connected clients
 wss.broadcast = (data) => {
-	wss.clients.forEach((client) => {
-		if (client.readyState === WebSocket.OPEN) {
-			client.send(data);
-		}
-	});
+    wss.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+            client.send(data);
+        }
+    });
 };
 
 server.listen(3000, () => {
-	console.log('Server listening on %d', server.address().port);
+    console.log('Server listening on %d \n', server.address().port);
 });
