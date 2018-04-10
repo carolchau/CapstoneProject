@@ -77,8 +77,7 @@ wss.on('connection', (client) => {
 
     // Client disconnect
     client.on('close', (connection) => {
-        console.log('Player  disconnected! :( \n');
-        console.log(client.unique_id);
+        console.log('Player[' + client.unique_id + '] disconnected! :( \n');
     });
 });
 
