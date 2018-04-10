@@ -138,6 +138,8 @@ class GameObject {
 	}
 
 	// Getters and setters
+	get id () { return this._id; }
+	set id (id) {this._id = id; }
 	get x () {return this._x;}
 	set x (x) {this._x = x;}
 	get y () {return this._y;}
@@ -294,57 +296,57 @@ class WorldChunk {
 }
 
 
-document.addEventListener("DOMContentLoaded", function(event) {
-	canvas = document.getElementById('game');
-	canvas.width = window.innerWidth;
-	canvas.height = window.innerHeight;
-	ctx = canvas.getContext('2d');
-
-	asset_manager = new AssetManager();
-	img_list = ['img/Grass.png', 'img/Sand.png', 'img/Snow.png',
-							'img/Swamp.png', 'img/Jungle.png', 'img/Water.png'];
-	player_stand_n = ['img/Player/standS.png'];
-	player_stand_s = ['img/Player/standS.png'];
-	player_stand_w = ['img/Player/standW.png'];
-	player_stand_e = ['img/Player/standE.png'];
-	player_walk_n = ['img/Player/walk1N.png','img/Player/walk2N.png'];
-	player_walk_s = ['img/Player/walk1S.png','img/Player/walk2S.png'];
-	player_walk_w = ['img/Player/walk1W.png','img/Player/walk2W.png'];
-	player_walk_e = ['img/Player/walk1E.png','img/Player/walk2E.png'];
-	img_list = img_list.concat(player_stand_n, player_stand_s, player_stand_w,
-														 player_stand_e, player_walk_n, player_walk_s,
-														 player_walk_w, player_walk_e);
-	asset_manager.load_images(img_list, () => {
-
-		let biomes = {};
-		biomes['grass'] = new StaticObject(0);
-		biomes['grass'].load_sprite('img/Grass.png');
-		biomes['sand'] = new StaticObject(0);
-		biomes['sand'].load_sprite('img/Sand.png');
-		biomes['snow'] = new StaticObject(0);
-		biomes['snow'].load_sprite('img/Snow.png');
-		biomes['swamp'] = new StaticObject(0);
-		biomes['swamp'].load_sprite('img/Swamp.png');
-		biomes['jungle'] = new StaticObject(0);
-		biomes['jungle'].load_sprite('img/Jungle.png');
-		biomes['water'] = new StaticObject(0);
-		biomes['water'].load_sprite('img/Water.png');
-
-		player = new AnimatedObject('player');
-		player.load_animation('idle_n', player_stand_n, 0);
-		player.load_animation('idle_s', player_stand_s, 0);
-		player.load_animation('idle_w', player_stand_w, 0);
-		player.load_animation('idle_e', player_stand_e, 0);
-		player.load_animation('walk_n', player_walk_n, 5);
-		player.load_animation('walk_s', player_walk_s, 5);
-		player.load_animation('walk_w', player_walk_w, 5);
-		player.load_animation('walk_e', player_walk_e, 5);
-		player.x = 32000;
-		player.y = 32000;
-
-		$.getJSON("js/graphics/gen.json", function(gen_json) {
-			manager = new GameManager(ctx, canvas.width, canvas.height, gen_json, biomes, player);
-			manager.gen_around_player(start=true);
-		});
-	});
-});
+//document.addEventListener("DOMContentLoaded", function(event) {
+//	canvas = document.getElementById('game');
+//	canvas.width = window.innerWidth;
+//	canvas.height = window.innerHeight;
+//	ctx = canvas.getContext('2d');
+//
+//	asset_manager = new AssetManager();
+//	img_list = ['img/Grass.png', 'img/Sand.png', 'img/Snow.png',
+//							'img/Swamp.png', 'img/Jungle.png', 'img/Water.png'];
+//	player_stand_n = ['img/Player/standS.png'];
+//	player_stand_s = ['img/Player/standS.png'];
+//	player_stand_w = ['img/Player/standW.png'];
+//	player_stand_e = ['img/Player/standE.png'];
+//	player_walk_n = ['img/Player/walk1N.png','img/Player/walk2N.png'];
+//	player_walk_s = ['img/Player/walk1S.png','img/Player/walk2S.png'];
+//	player_walk_w = ['img/Player/walk1W.png','img/Player/walk2W.png'];
+//	player_walk_e = ['img/Player/walk1E.png','img/Player/walk2E.png'];
+//	img_list = img_list.concat(player_stand_n, player_stand_s, player_stand_w,
+//														 player_stand_e, player_walk_n, player_walk_s,
+//														 player_walk_w, player_walk_e);
+//	asset_manager.load_images(img_list, () => {
+//
+//		let biomes = {};
+//		biomes['grass'] = new StaticObject(0);
+//		biomes['grass'].load_sprite('img/Grass.png');
+//		biomes['sand'] = new StaticObject(0);
+//		biomes['sand'].load_sprite('img/Sand.png');
+//		biomes['snow'] = new StaticObject(0);
+//		biomes['snow'].load_sprite('img/Snow.png');
+//		biomes['swamp'] = new StaticObject(0);
+//		biomes['swamp'].load_sprite('img/Swamp.png');
+//		biomes['jungle'] = new StaticObject(0);
+//		biomes['jungle'].load_sprite('img/Jungle.png');
+//		biomes['water'] = new StaticObject(0);
+//		biomes['water'].load_sprite('img/Water.png');
+//
+//		player = new AnimatedObject('player');
+//		player.load_animation('idle_n', player_stand_n, 0);
+//		player.load_animation('idle_s', player_stand_s, 0);
+//		player.load_animation('idle_w', player_stand_w, 0);
+//		player.load_animation('idle_e', player_stand_e, 0);
+//		player.load_animation('walk_n', player_walk_n, 5);
+//		player.load_animation('walk_s', player_walk_s, 5);
+//		player.load_animation('walk_w', player_walk_w, 5);
+//		player.load_animation('walk_e', player_walk_e, 5);
+//		player.x = 32000;
+//		player.y = 32000;
+//
+//		$.getJSON("js/graphics/gen.json", function(gen_json) {
+//			manager = new GameManager(ctx, canvas.width, canvas.height, gen_json, biomes, player);
+//			manager.gen_around_player(start=true);
+//		});
+//	});
+//});
