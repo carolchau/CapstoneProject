@@ -13,7 +13,10 @@ app.use(express.static('public'));
 
 // Routes
 app.get('/', (req, res) => {
-    res.render('index.ejs');
+	res.render('index.ejs');
+});
+app.get('/graphicstest', (req, res) => {
+	res.render('graphicstest.ejs');
 });
 
 const server = http.createServer(app);
@@ -27,11 +30,11 @@ var unique_counter = 0;
 setInterval(function(){
     var data = {type: "world_data"}
     for (let client of wss.clients) {
-         data[client.unique_id] = {x_position: client.x_position, 
+         data[client.unique_id] = {x_position: client.x_position,
                                    y_position: client.y_position};
     }
     wss.broadcast(JSON.stringify(data));
-    }, 500)
+}, 50);
 
 // Listen in on every WebSocket connection
 wss.on('connection', (client) => {
