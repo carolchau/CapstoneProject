@@ -53,16 +53,16 @@ wss.on('connection', (client) => {
         var message = JSON.parse(msg);
 
         if(message.type == "input"){
-            if(message.input == 37){
+            if(message.left){
                 client.x_position-=5;
             }
-            else if(message.input == 38){
+            if(message.up){
                 client.y_position-=5;
             }
-            else if(message.input == 39){
+            if(message.right){
                 client.x_position+=5;
             }
-            else if(message.input == 40){
+            if(message.down){
                 client.y_position+=5;
             }
         }
@@ -80,8 +80,9 @@ wss.on('connection', (client) => {
 
     // Client disconnect
     client.on('close', (connection) => {
-        console.log('Player  disconnected! :( \n');
-        console.log(client.unique_id);
+        var data = {type: "disconnect", player: client.unique_id}
+        wss.broadcast(JSON.stringify(data));
+        console.log('Player[' + client.unique_id + '] disconnected! :( \n');
     });
 });
 

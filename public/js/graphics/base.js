@@ -2,7 +2,7 @@
 const WORLD_UNIT = 16;
 const WORLD_SIZE = 4000;  // in world units
 const CHUNK_SIZE = 1600;  // in px
-const GEN_IMG_SIZE = 2000;  // in px
+const GEN_IMG_SIZE = 500;  // in px
 const FPS = 1/24*1000;  // in millis
 
 var canvas = null, ctx = null, canvas_width = 0, canvas_height = 0;
@@ -29,6 +29,8 @@ class GameManager {
 	}
 
 	add_object(obj) { this._objects[obj.id] = obj; }
+
+    drop_object(id) {delete this._objects[id]}
 
 	update () {
 		this.player.update();
@@ -236,19 +238,27 @@ class Player extends AnimatedObject {
 	update () {
 		super.update();
 		if (this._last_x_pos < this._x) {
-			this.play_anim('walk_e');
+			if (this._current_sprite[0] != 'walk_e') {
+				this.play_anim('walk_e');
+			}
 			this._idle = false;
 		}
 		else if (this._last_x_pos > this._x) {
-			this.play_anim('walk_w');
+			if (this._current_sprite[0] != 'walk_w') {
+				this.play_anim('walk_w');
+			}
 			this._idle = false;
 		}
 		else if (this._last_y_pos < this._y) {
-			this.play_anim('walk_s');
+			if (this._current_sprite[0] != 'walk_s') {
+				this.play_anim('walk_s');
+			}
 			this._idle = false;
 		}
 		else if (this._last_y_pos > this._y) {
-			this.play_anim('walk_n');
+			if (this._current_sprite[0] != 'walk_n') {
+				this.play_anim('walk_n');
+			}
 			this._idle = false;
 		}
 
