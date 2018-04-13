@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			$.getJSON("js/graphics/gen2k.json", function(gen_json) {
 				console.log('hello')
 				manager = new GameManager(ctx, canvas.width, canvas.height, gen_json, biomes, player);
-				manager.gen_around_player(start=true);
+				manager.gen_around_player();
 				manager.start();
 			});
 		});
@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     var client_id = -1;
 
     // Make WebSocket connection
-    var ws = new WebSocket('ws://127.0.0.1:3000');
+    var ws = new WebSocket('ws://localhost:3000');
 
     // When connection is made
     ws.onopen = () => {
