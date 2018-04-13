@@ -1,5 +1,5 @@
 // Load requirements
-var localStrategy = require('passport-local').Strategy;
+var LocalStrategy = require('passport-local').Strategy;
 
 // Load up the user model
 var User = require('../models/user');
