@@ -1,15 +1,14 @@
 // global constants
 const WORLD_UNIT = 16;
-const WORLD_SIZE = 4000;  // in world units
+const WORLD_SIZE = 4000;  // in world units (so actual world size in px is 4000*16)
 const CHUNK_SIZE = 1600;  // in px
 const GEN_IMG_SIZE = 2000;  // in px
 const FPS = 1/24*1000;  // in millis
-const WORLD_TO_GEN_IMG_RATIO = WORLD_SIZE/GEN_IMG_SIZE * WORLD_UNIT;
 
+// expose game canvas globally
 var canvas = null, ctx = null, canvas_width = 0, canvas_height = 0;
-let offscreen_canvas = null, offscreen_ctx = null;
 
-// globally cached sprites and world chunks
+// globally cached sprites
 var cached_assets = {};
 
 let gen_key_map = {
@@ -21,8 +20,15 @@ let gen_key_map = {
 	5: 'grass'
 };
 
-
+// Main game manager for the game (should only have one instance)
+// Takes care of all updates and drawing
 class GameManager {
+	// ctx (canvas context): the canvas context to draw on
+	// width (int): width of the canvas
+	// height (int): height of the canvas
+	// gen_key (dict): JSON of gen key
+	// biomes_dict (dict): dict of biome name: sprites pairs
+	// player (Player): active player
 	constructor (ctx, width, height, gen_key, biomes_dict, player) {
 		this._ctx = ctx;
 		this._can_width = width;
@@ -31,6 +37,8 @@ class GameManager {
 		this._biomes = biomes_dict;
 		this.player = player;
 
+		// viewrect is the bounds of the canvas in the real world, so kind of like
+		// a camera centered on the player
 		this.viewrect_x = this.player.x - width/2;
 		this.viewrect_y = this.player.y - height/2;
 		this.viewrect_right = this.viewrect_x + this._can_width;
@@ -40,17 +48,21 @@ class GameManager {
 		this._chunks = {};
 	}
 
+	// Add or remove object from list of gameobjects
 	add_object (obj) { this._objects[obj.id] = obj; }
   drop_object (id) { delete this._objects[id]; }
 
 	update () {
 		this.player.update();
 		this.gen_around_player();
+
+		// update viewrect to be around player's new position
 		this.viewrect_x = this.player.x - this._can_width/2;
 		this.viewrect_y = this.player.y - this._can_height/2;
 		this.viewrect_right = this.viewrect_x + this._can_width;
 		this.viewrect_bot = this.viewrect_y + this._can_height;
 
+		// update all gameobjects
 		let object_keys = Object.keys(this._objects);
 		let num_of_chunks = object_keys.length;
 		for (let i = 0; i < num_of_chunks; i++) {
@@ -63,13 +75,19 @@ class GameManager {
 		let object_keys = Object.keys(this._objects);
 		let num_of_objects = object_keys.length;
 		let filled_chunks = {}
+		// this can be redrawn selectively only if active player doesn't move,
+		// otherwise the background and all visible objects need to be shifted
 		if (!this.player.moved) {
 			for (let i = 0; i < num_of_objects; i++) {
 				let obj = this._objects[object_keys[i]];
+				// canvas coordinates at which to clear
 				let clear_x = obj.last_x - this.viewrect_x, clear_y = obj.last_y - this.viewrect_y;
+				// check if each animated object moved and is visible
 				if (obj.moved && !(Math.abs(clear_x) > this._can_width || Math.abs(clear_y) > this._can_height)) {
+					//clear rectangle only around moving object
 					this._ctx.clearRect(clear_x, clear_y, obj.width, obj.height);
 
+					// redraw 16x16 background blocks around the cleared rectangle
 					let leftmost_block_x = obj.last_x - (obj.last_x%WORLD_UNIT), topmost_block_y = obj.last_y - (obj.last_y%WORLD_UNIT);
 					let rightmost_block_x = (obj.last_x + obj.width) + (WORLD_UNIT - (obj.last_x + obj.width)%WORLD_UNIT);
 					let bottommost_block_y = (obj.last_y + obj.height) + (WORLD_UNIT - (obj.last_y + obj.height)%WORLD_UNIT);
@@ -85,6 +103,7 @@ class GameManager {
 							this._biomes[gen_key_map[gen_value]].draw(this._ctx, this.viewrect_x, this.viewrect_y);
 						}
 					}
+					// set the world chunk to filled, so it does not need to be redrawn
 					let chunk_x_left = Math.floor(obj.x/CHUNK_SIZE), chunk_y_top = Math.floor(obj.y/CHUNK_SIZE);
 					filled_chunks[chunk_x_left.toString() + ',' + chunk_y_top.toString()] = true;
 				}
@@ -100,7 +119,6 @@ class GameManager {
 				let chunk_id_x = x_left_chunk + i, chunk_id_y = y_top_chunk + j;
 				let chunk_id = chunk_id_x + ',' + chunk_id_y;
 				if (this.player.stopped_moving || (!filled_chunks[chunk_id] && this.player.moved)) {
-					console.log(chunk_id, 'drawn')
 					this._chunks[chunk_id].draw(this._ctx, this.viewrect_x, this.viewrect_y);
 				}
 			}
@@ -112,6 +130,7 @@ class GameManager {
 			this._objects[object_keys[i]].postdraw();
 		}
 
+		// draw player
 		this.player.draw(this._ctx, this.viewrect_x, this.viewrect_y);
 		this.player.postdraw();
 	}
@@ -121,14 +140,17 @@ class GameManager {
 			this.draw();
 	}
 
+	// Start main game loop after setting active player position to idle
 	start () {
 		this.player.play_anim('idle_s');
 		var _this = this;
 		setInterval(function() {_this.main_loop()}, FPS);
 	}
 
+	// Generate world chunks around player
 	gen_around_player () {
 		let x = this.player.x, y = this.player.y;
+		// Find the closest chunks that cover the entire viewrect
 		let x_left = x - this._can_width/2 - CHUNK_SIZE, y_top = y - this._can_height/2 - CHUNK_SIZE;
 		let x_right = x + this._can_width/2 + CHUNK_SIZE, y_bot = y + this._can_height/2 + CHUNK_SIZE;
 
@@ -144,10 +166,9 @@ class GameManager {
 				let ch_x_left = leftmost_chunk_x + i*CHUNK_SIZE;
 				let ch_y_top = topmost_chunk_y + j*CHUNK_SIZE;
 
+				// if the chunk isn't generated yet, generate it
 				if (this._chunks[chunk_id] == null) {
 					let chunk = new WorldChunk(this._gen_key, this._biomes);
-					console.log('new chunk:',ch_x_left, ch_y_top);
-					console.log(chunk_id)
 					chunk.gen(ch_x_left, ch_y_top);
 					this._chunks[chunk_id] = chunk;
 				}
@@ -156,8 +177,11 @@ class GameManager {
 	}
 }
 
-
+// Main asset manager for game (should only have one instance)
+// Loads images
 class AssetManager {
+	// img_list (array): list of image names to load
+	// postload (function): callback function after all images are loaded
 	load_images(img_list, postload) {
 		let num_of_images = img_list.length;
 		let batch = {
@@ -185,7 +209,7 @@ class AssetManager {
 }
 
 // GameObject class
-// Has objec basic properites: id, sprite, and position
+// Has object basic properites: id, sprite, and position
 // Can be drawn to canvas
 class GameObject {
 	constructor (id) {
@@ -206,6 +230,7 @@ class GameObject {
 	get width () {return this._width;}
 	get height () {return this._height;}
 
+	// AABB collision true/false
 	is_visible (v_left, v_right, v_top, v_bot) {
 		return (v_left < this._x_right && v_right > this._x_left &&
 						v_top < this._y_bot && v_bot > this._y_top);
@@ -213,6 +238,7 @@ class GameObject {
 }
 
 
+// Static game object, cannot move or change animation
 class StaticObject extends GameObject {
 	// Load img for img_name. Only one image can be loaded for a static object
 	// return false if load fails, else return true
@@ -227,16 +253,18 @@ class StaticObject extends GameObject {
 
 	// Draw sprite at x,y position of object
 	draw (ctx, ctx_left, ctx_top) {
+		// offset position by viewrect, so drawn relative to viewrect
 		ctx.drawImage(this._sprites['idle'][0], this._x - ctx_left, this._y - ctx_top);
 	}
 }
 
 
+// Object supports various animations/position changes
 class AnimatedObject extends GameObject {
 	constructor (id) {
 		super(id);
 		this._sprite_change_time = null;
-		this._current_sprite = [];  // tuple of animation name, current frame number
+		this._current_sprite = [];  // tuple of (animation name, current frame number)
 		this._last_x_pos = this._x;
 		this._last_y_pos = this._y;
 		this._anim = null;
@@ -244,17 +272,20 @@ class AnimatedObject extends GameObject {
 		this._stopped_moving = true;
 	}
 
+	// getters
 	get last_x () { return this._last_x_pos; }
 	get last_y () { return this._last_y_pos; }
 	get moved () { return this._moved; }
 	get stopped_moving () { return this._stopped_moving; }
 
+	// check if object moved
 	update () {
 		let moved = this._moved;
 		this._moved = (this._x - this._last_x_pos != 0 || this._y - this._last_y_pos != 0);
 		this._stopped_moving = this._moved != moved;
 	}
 
+	// set last position to current
 	postdraw () {
 		this._last_x_pos = this._x;
 		this._last_y_pos = this._y;
@@ -263,6 +294,9 @@ class AnimatedObject extends GameObject {
 	// Load all images in list. If image load fails, abort load but store already
 	// loaded images. Next time list is passed, just load remaining.
 	// return false if load fails, else return true
+	// anim_name (str): name of animation
+	// img_name (array): list of srite names for the animation
+	// animation_length (int): length of animation in seconds
 	load_animation (anim_name, img_names, animation_length) {
 		let length = img_names.length;
 		this._sprites[anim_name] = [];
@@ -277,10 +311,13 @@ class AnimatedObject extends GameObject {
 		return true;
 	}
 
+	// play animation with name anim_name
+	// anim_name (str): animation name
 	play_anim (anim_name) {
 		clearInterval(this._anim);
 		this._current_sprite[0] = anim_name;
 		this._current_sprite[1] = 0;
+		// if it is a multi-frame animation, set sprite change rate
 		if (this._sprites[anim_name].length != 1) {
 			this._anim = setInterval(() => {
 				this._current_sprite[1] = ++this._current_sprite[1] % this._sprites[anim_name].length;
@@ -296,12 +333,15 @@ class AnimatedObject extends GameObject {
 }
 
 
+// Player is a special AnimatedObject which just has special animations
+// depending on what direciton player is facing
 class Player extends AnimatedObject {
 	constructor (id) {
 		super(id);
 		this._idle = true;
 	}
 
+	// play different animations depending on movement direction
 	update () {
 		if (this._last_x_pos < this._x) {
 			if (this._current_sprite[0] != 'walk_e') {
@@ -328,6 +368,7 @@ class Player extends AnimatedObject {
 			this._idle = false;
 		}
 
+		// if no movement play idle animation depending on direction facing
 		if (this._last_x_pos == this._x && this._last_y_pos == this._y && !this._idle) {
 			if (this._current_sprite[0] == 'walk_n') {
 				this.play_anim('idle_n');
@@ -349,6 +390,7 @@ class Player extends AnimatedObject {
 		super.update();
 	}
 
+	// make sure animation name is one of the following in if statement
 	load_animation (anim_name, img_names, animation_length) {
 		if (anim_name != 'idle_n' && anim_name != 'idle_s' &&
 				anim_name != 'idle_w' && anim_name != 'idle_e' &&
@@ -359,12 +401,14 @@ class Player extends AnimatedObject {
 }
 
 
+// Square background tile of defined size that is rendered in a single
+// draw call to the game canvas to optimize performance
 class WorldChunk {
 	constructor (gen_key, biomes_dict) {
 		this._gen_key = gen_key;
 		this._biomes = biomes_dict;
 
-		this._can = document.createElement('canvas');
+		this._can = document.createElement('canvas');  // offscreen canvas
 		this._can.width = CHUNK_SIZE;
 		this._can.height = CHUNK_SIZE;
 		this._ctx = this._can.getContext('2d');
@@ -377,6 +421,9 @@ class WorldChunk {
 		this._genned = false;
 	}
 
+	// fill the tile from 16x16 biome blocks on the offscreen canvas (prerender)\
+	// x_left (int): position of left boundary of tile
+	// y_top (int): position of upper boundary of tile
 	gen (x_left, y_top) {
 		if (!this._genned) {
 			this._x_left = x_left;
@@ -398,6 +445,7 @@ class WorldChunk {
 		}
 	}
 
+	// AABB collision detection
 	is_visible (v_left, v_right, v_top, v_bot) {
 		return (v_left < this._x_right && v_right > this._x_left &&
 						v_top < this._y_bot && v_bot > this._y_top);
