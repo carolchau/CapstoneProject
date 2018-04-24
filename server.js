@@ -59,24 +59,26 @@ var unique_counter = 0;
 
 setInterval(function() {
 	var data = {
-		type: "world_data"
+		type: 'world_data'
 	};
 	for (let client of wss.clients) {
-		data[client.unique_id] = {x_position: client.x_position,
-		                         y_position: client.y_position};
+		data[client.unique_id] = {
+			x_position: client.x_position,
+			y_position: client.y_position
+		};
 	}
 	wss.broadcast(JSON.stringify(data));
 }, 50);
 
 // Listen in on every WebSocket connection
 wss.on('connection', (client) => {
-	console.log("Dab for the new connection \n");
+	console.log('Dab for the new connection \n');
 
 	client.unique_id = unique_counter;
 	client.x_position = 32000;
 	client.y_position = 32000;
 	var player_data = {
-		type: "id",
+		type: 'id',
 		player_id: unique_counter
 	};
 	client.send(JSON.stringify(player_data));
@@ -85,39 +87,39 @@ wss.on('connection', (client) => {
 
 	// When message is received from client
 	client.on('message', (msg) => {
-	  var message = JSON.parse(msg);
+		var message = JSON.parse(msg);
 
-	  if(message.type == "input"){
-	      if(message.left){
-	          client.x_position-=5;
-	      }
-	      if(message.up){
-	          client.y_position-=5;
-	      }
-	      if(message.right){
-	          client.x_position+=5;
-	      }
-	      if(message.down){
-	          client.y_position+=5;
-	      }
-	  }
-	  else {
-	    console.log("Following message received from client: \n");
-	    console.log(message);
-	    wss.broadcast(msg);
-	  }
+		if(message.type == 'input'){
+			if(message.left){
+				client.x_position-=5;
+			}
+			if(message.up){
+				client.y_position-=5;
+			}
+			if(message.right){
+				client.x_position+=5;
+			}
+			if(message.down){
+				client.y_position+=5;
+			}
+		}
+		else {
+			console.log('Following message received from client: \n');
+			console.log(message);
+			wss.broadcast(msg);
+		}
 	});
 
 	// Error handling
 	client.on('error', (error) => {
-	  console.log('An Error has occurred: \n' + error);
+		console.log('An Error has occurred: \n' + error);
 	});
 
 	// Client disconnect
 	client.on('close', (connection) => {
-	  var data = {type: "disconnect", player: client.unique_id}
-	  wss.broadcast(JSON.stringify(data));
-	  console.log('Player[' + client.unique_id + '] disconnected! :( \n');
+		var data = {type: 'disconnect', player: client.unique_id};
+		wss.broadcast(JSON.stringify(data));
+		console.log('Player[' + client.unique_id + '] disconnected! :( \n');
 	});
 });
 

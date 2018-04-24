@@ -23,12 +23,12 @@ let gen_key_map = {
 // Main game manager for the game (should only have one instance)
 // Takes care of all updates and drawing
 class GameManager {
-	// ctx (canvas context): the canvas context to draw on
-	// width (int): width of the canvas
-	// height (int): height of the canvas
-	// gen_key (dict): JSON of gen key
-	// biomes_dict (dict): dict of biome name: sprites pairs
-	// player (Player): active player
+// ctx (canvas context): the canvas context to draw on
+// width (int): width of the canvas
+// height (int): height of the canvas
+// gen_key (dict): JSON of gen key
+// biomes_dict (dict): dict of biome name: sprites pairs
+// player (Player): active player
 	constructor (ctx, width, height, gen_key, biomes_dict, player) {
 		this._ctx = ctx;
 		this._can_width = width;
@@ -50,7 +50,7 @@ class GameManager {
 
 	// Add or remove object from list of gameobjects
 	add_object (obj) { this._objects[obj.id] = obj; }
-  drop_object (id) { delete this._objects[id]; }
+	drop_object (id) { delete this._objects[id]; }
 
 	update () {
 		this.player.update();
@@ -74,7 +74,7 @@ class GameManager {
 		// clearing and refilling background
 		let object_keys = Object.keys(this._objects);
 		let num_of_objects = object_keys.length;
-		let filled_chunks = {}
+		let filled_chunks = {};
 		// this can be redrawn selectively only if active player doesn't move,
 		// otherwise the background and all visible objects need to be shifted
 		if (!this.player.moved) {
@@ -95,9 +95,9 @@ class GameManager {
 					for (let i = leftmost_block_x; i < rightmost_block_x; i+=WORLD_UNIT) {
 						for (let j = topmost_block_y; j < bottommost_block_y; j+=WORLD_UNIT) {
 							let genx = Math.floor(GEN_IMG_SIZE*(i/WORLD_UNIT)/WORLD_SIZE);
-				   		let geny = Math.floor(GEN_IMG_SIZE*(j/WORLD_UNIT)/WORLD_SIZE);
-					  	if (genx > GEN_IMG_SIZE || geny > GEN_IMG_SIZE) break;
-					  	let gen_value = this._gen_key[genx][geny];
+							let geny = Math.floor(GEN_IMG_SIZE*(j/WORLD_UNIT)/WORLD_SIZE);
+							if (genx > GEN_IMG_SIZE || geny > GEN_IMG_SIZE) break;
+							let gen_value = this._gen_key[genx][geny];
 							this._biomes[gen_key_map[gen_value]].x = i;
 							this._biomes[gen_key_map[gen_value]].y = j;
 							this._biomes[gen_key_map[gen_value]].draw(this._ctx, this.viewrect_x, this.viewrect_y);
@@ -136,15 +136,15 @@ class GameManager {
 	}
 
 	main_loop () {
-			this.update();
-			this.draw();
+		this.update();
+		this.draw();
 	}
 
 	// Start main game loop after setting active player position to idle
 	start () {
 		this.player.play_anim('idle_s');
 		var _this = this;
-		setInterval(function() {_this.main_loop()}, FPS);
+		setInterval(function() {_this.main_loop();}, FPS);
 	}
 
 	// Generate world chunks around player
@@ -180,8 +180,8 @@ class GameManager {
 // Main asset manager for game (should only have one instance)
 // Loads images
 class AssetManager {
-	// img_list (array): list of image names to load
-	// postload (function): callback function after all images are loaded
+// img_list (array): list of image names to load
+// postload (function): callback function after all images are loaded
 	load_images(img_list, postload) {
 		let num_of_images = img_list.length;
 		let batch = {
@@ -192,7 +192,7 @@ class AssetManager {
 		let onload_image = () => {
 			batch.count++;
 			if (batch.count == batch.total) batch.callback();
-		}
+		};
 		for (let i = 0; i < num_of_images; i++) {
 			let name = img_list[i];
 			if (cached_assets[name] == null) {
@@ -233,15 +233,15 @@ class GameObject {
 	// AABB collision true/false
 	is_visible (v_left, v_right, v_top, v_bot) {
 		return (v_left < this._x_right && v_right > this._x_left &&
-						v_top < this._y_bot && v_bot > this._y_top);
+v_top < this._y_bot && v_bot > this._y_top);
 	}
 }
 
 
 // Static game object, cannot move or change animation
 class StaticObject extends GameObject {
-	// Load img for img_name. Only one image can be loaded for a static object
-	// return false if load fails, else return true
+// Load img for img_name. Only one image can be loaded for a static object
+// return false if load fails, else return true
 	load_sprite (img_name) {
 		if (cached_assets[img_name] == null) return false;
 		this._sprites['idle'] = [];
@@ -393,9 +393,9 @@ class Player extends AnimatedObject {
 	// make sure animation name is one of the following in if statement
 	load_animation (anim_name, img_names, animation_length) {
 		if (anim_name != 'idle_n' && anim_name != 'idle_s' &&
-				anim_name != 'idle_w' && anim_name != 'idle_e' &&
-				anim_name != 'walk_n' && anim_name != 'walk_s' &&
-				anim_name != 'walk_w' && anim_name != 'walk_e') return;
+anim_name != 'idle_w' && anim_name != 'idle_e' &&
+anim_name != 'walk_n' && anim_name != 'walk_s' &&
+anim_name != 'walk_w' && anim_name != 'walk_e') return;
 		super.load_animation(anim_name, img_names, animation_length);
 	}
 }
@@ -448,7 +448,7 @@ class WorldChunk {
 	// AABB collision detection
 	is_visible (v_left, v_right, v_top, v_bot) {
 		return (v_left < this._x_right && v_right > this._x_left &&
-						v_top < this._y_bot && v_bot > this._y_top);
+v_top < this._y_bot && v_bot > this._y_top);
 	}
 
 	draw (ctx, ctx_left, ctx_top) {
