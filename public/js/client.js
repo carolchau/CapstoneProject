@@ -81,8 +81,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
         msg = $('#input_message').val();
         var data = {
             type: "chat",
-            player: client_id,
-            text: msg
+            data: {player: client_id,
+                   text: msg}
         };
         ws.send(JSON.stringify(data));
         $('#input_message').val('');
@@ -100,10 +100,10 @@ document.addEventListener("DOMContentLoaded", function(event) {
             key_map[e.keyCode] = true;
             var data = {
                 type: "input",
-                left: key_map[37],
-                up: key_map[38],
-                right: key_map[39],
-                down: key_map[40]
+                data:{left: key_map[37],
+                      up: key_map[38],
+                      right: key_map[39],
+                      down: key_map[40]}
             };
             ws.send(JSON.stringify(data));
         }
@@ -128,23 +128,23 @@ document.addEventListener("DOMContentLoaded", function(event) {
         }
 
         if (message.type == "chat") {
-            var chatmsg = message.text;
-            message.player++;
-            $('#chat-history').append($('<li>').text("Player_" + message.player + ": " + chatmsg));
+            var chatmsg = message.data.text;
+            message.data.player++;
+            $('#chat-history').append($('<li>').text("Player_" + message.data.player + ": " + chatmsg));
         } else if (message.type == "disconnect") {
-            var player_to_drop = message.player;
+            var player_to_drop = message.data.player;
 						console.log(player_to_drop)
             manager.drop_object('player_'+player_to_drop);
         } else if (message.type == "world_data") {
             if (manager != null) {
-                player_keys = Object.keys(message);
+                player_keys = Object.keys(message.data);
                 num_of_players = player_keys.length;
                 for (let i = 0; i < num_of_players; i++) {
                     let id = 'player_' + player_keys[i]
                     if (player_keys[i] == 'type') continue;
                     if (player_keys[i] == client_id) {
-                        player.x = message[client_id].x_position;
-                        player.y = message[client_id].y_position;
+                        player.x = message["data"][client_id]["x_position"];
+                        player.y = message["data"][client_id]["y_position"];
                     } else {
                         if (manager._objects[id] == null) {
                             let new_player = new Player(id);
@@ -156,18 +156,18 @@ document.addEventListener("DOMContentLoaded", function(event) {
                             new_player.load_animation('walk_s', player_walk_s, 5);
                             new_player.load_animation('walk_w', player_walk_w, 5);
                             new_player.load_animation('walk_e', player_walk_e, 5);
-                            new_player.x = message[player_keys[i]].x_position;
-                            new_player.y = message[player_keys[i]].y_position;
+                            new_player.x = message["data"][player_keys[i]]["x_position"];
+                            new_player.y = message["data"][player_keys[i]]["y_position"];
                             manager.add_object(new_player);
                         } else {
-                            manager._objects[id].x = message[player_keys[i]].x_position;
-                            manager._objects[id].y = message[player_keys[i]].y_position;
+                            manager._objects[id].x = message["data"][player_keys[i]]["x_position"];
+                            manager._objects[id].y = message["data"][player_keys[i]]["y_position"];
                         }
                     }
                 }
             }
         } else if (message.type == "id") {
-            client_id = message.player_id;
+            client_id = message.data.player_id;
             player.id = 'player_' + client_id;
         }
     };
