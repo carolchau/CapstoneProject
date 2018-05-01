@@ -141,7 +141,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 num_of_players = player_keys.length;
                 for (let i = 0; i < num_of_players; i++) {
                     let id = 'player_' + player_keys[i]
-                    if (player_keys[i] == 'type') continue;
                     if (player_keys[i] == client_id) {
                         player.x = message["data"][client_id]["x_position"];
                         player.y = message["data"][client_id]["y_position"];
