@@ -12,7 +12,7 @@ const wss = new WebSocket.Server({ server });
 var mongoose = require('mongoose');
 var passport = require('passport');
 var flash = require('connect-flash');
-var logger = require('morgan');
+//var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
@@ -25,7 +25,7 @@ mongoose.connect(configDB.url, { useMongoClient: true });
 require('./config/passport')(passport);
 
 // Set up Express App
-app.use(logger('combined'));
+//app.use(logger('combined'));
 
 // BodyParser Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -59,11 +59,12 @@ var unique_counter = 0;
 
 setInterval(function() {
 	var data = {
-		type: "world_data"
+		type: "world_data",
+        data: {}
 	};
 	for (let client of wss.clients) {
-		data[client.unique_id] = {x_position: client.x_position,
-		                         y_position: client.y_position};
+		data["data"][client.unique_id] = {x_position: client.x_position,
+		                                  y_position: client.y_position};
 	}
 	wss.broadcast(JSON.stringify(data));
 }, 50);
@@ -77,7 +78,7 @@ wss.on('connection', (client) => {
 	client.y_position = 32000;
 	var player_data = {
 		type: "id",
-		player_id: unique_counter
+		data: {player_id: unique_counter}
 	};
 	client.send(JSON.stringify(player_data));
 
@@ -88,16 +89,16 @@ wss.on('connection', (client) => {
 	  var message = JSON.parse(msg);
 
 	  if(message.type == "input"){
-	      if(message.left){
+	      if(message.data.left){
 	          client.x_position-=5;
 	      }
-	      if(message.up){
+	      if(message.data.up){
 	          client.y_position-=5;
 	      }
-	      if(message.right){
+	      if(message.data.right){
 	          client.x_position+=5;
 	      }
-	      if(message.down){
+	      if(message.data.down){
 	          client.y_position+=5;
 	      }
 	  }
@@ -115,7 +116,7 @@ wss.on('connection', (client) => {
 
 	// Client disconnect
 	client.on('close', (connection) => {
-	  var data = {type: "disconnect", player: client.unique_id}
+	  var data = {type: "disconnect", data:{player: client.unique_id}}
 	  wss.broadcast(JSON.stringify(data));
 	  console.log('Player[' + client.unique_id + '] disconnected! :( \n');
 	});
