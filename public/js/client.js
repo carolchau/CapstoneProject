@@ -57,9 +57,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
     });
 
 		// chat input send
-    $('form').submit(() => {
-        msg = $('#input_message').val();
-        var data = {
+    $('form').submit((e) => {
+        let msg = $('#input_message').val();
+        let data = {
             type: "chat",
             data: {player: player.id,
                    text: msg}
@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     $(document).keydown(function(e) {
         if (e.keyCode in key_map) {
             key_map[e.keyCode] = true;
-            var data = {
+            let data = {
                 type: "input",
                 data:{left: key_map[37],
                       up: key_map[38],
@@ -109,8 +109,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
         if (message.type == "chat") {
             let chatmsg = message.data.text;
-            message.data.player++;
-            $('#chat-history').append($('<li>').text("Player_" + message.data.player + ": " + chatmsg));
+            $('#chat-history').append($('<li>').text(message.data.player + ": " + chatmsg));
         } else if (message.type == "disconnect") {
             let player_to_drop = message.data.player;
 						console.log(player_to_drop)
