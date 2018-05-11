@@ -56,12 +56,6 @@ class GameManager {
 		this.player.update();
 		this.gen_around_player();
 
-		// update viewrect to be around player's new position
-		this.viewrect_x = this.player.x - this._can_width/2;
-		this.viewrect_y = this.player.y - this._can_height/2;
-		this.viewrect_right = this.viewrect_x + this._can_width;
-		this.viewrect_bot = this.viewrect_y + this._can_height;
-
 		// update all gameobjects
 		let object_keys = Object.keys(this._objects);
 		let num_of_chunks = object_keys.length;
@@ -71,6 +65,12 @@ class GameManager {
 	}
 
 	draw () {
+		// update viewrect to be around player's new position
+		this.viewrect_x = this.player.x - this._can_width/2;
+		this.viewrect_y = this.player.y - this._can_height/2;
+		this.viewrect_right = this.viewrect_x + this._can_width;
+		this.viewrect_bot = this.viewrect_y + this._can_height;
+
 		// clearing and refilling background
 		let object_keys = Object.keys(this._objects);
 		let num_of_objects = object_keys.length;
@@ -136,8 +136,11 @@ class GameManager {
 	}
 
 	main_loop () {
-		this.update();
-		this.draw();
+			this.update();
+			var _this = this;
+			requestAnimationFrame(function() {
+				_this.draw();
+			});
 	}
 
 	// Start main game loop after setting active player position to idle

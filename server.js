@@ -12,7 +12,7 @@ const wss = new WebSocket.Server({ server });
 var mongoose = require('mongoose');
 var passport = require('passport');
 var flash = require('connect-flash');
-var logger = require('morgan');
+//var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
@@ -25,7 +25,7 @@ mongoose.connect(configDB.url, { useMongoClient: true });
 require('./config/passport')(passport);
 
 // Set up Express App
-app.use(logger('combined'));
+//app.use(logger('combined'));
 
 // BodyParser Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -59,6 +59,7 @@ var unique_counter = 0;
 
 setInterval(function() {
 	var data = {
+<<<<<<< HEAD
 		type: 'world_data'
 	};
 	for (let client of wss.clients) {
@@ -66,6 +67,14 @@ setInterval(function() {
 			x_position: client.x_position,
 			y_position: client.y_position
 		};
+=======
+		type: "world_data",
+        data: {}
+	};
+	for (let client of wss.clients) {
+		data["data"][client.unique_id] = {x_position: client.x_position,
+		                                  y_position: client.y_position};
+>>>>>>> b4bc1dce0bb6fc89b24b814d6863913c65d0733b
 	}
 	wss.broadcast(JSON.stringify(data));
 }, 50);
@@ -78,8 +87,8 @@ wss.on('connection', (client) => {
 	client.x_position = 32000;
 	client.y_position = 32000;
 	var player_data = {
-		type: 'id',
-		player_id: unique_counter
+		type: "id",
+		data: {player_id: unique_counter}
 	};
 	client.send(JSON.stringify(player_data));
 
@@ -117,9 +126,9 @@ wss.on('connection', (client) => {
 
 	// Client disconnect
 	client.on('close', (connection) => {
-		var data = {type: 'disconnect', player: client.unique_id};
-		wss.broadcast(JSON.stringify(data));
-		console.log('Player[' + client.unique_id + '] disconnected! :( \n');
+	  var data = {type: "disconnect", data:{player: client.unique_id}}
+	  wss.broadcast(JSON.stringify(data));
+	  console.log('Player[' + client.unique_id + '] disconnected! :( \n');
 	});
 });
 
