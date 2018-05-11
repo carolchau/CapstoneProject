@@ -4,6 +4,9 @@ const app = express();
 const http = require('http');
 const url = require('url');
 const WebSocket = require('ws');
+const { spawn } = require('child_process');
+const WORLD_UNIT = 16;
+const WORLD_SIZE = 4000;
 
 var port = process.env.PORT || 3000;
 const server = http.createServer(app);
@@ -76,6 +79,8 @@ wss.on('connection', (client) => {
 	client.unique_id = unique_counter;
 	client.x_position = 32000;
 	client.y_position = 32000;
+	client.width = 0;
+	client.height = 0;
 	var player_data = {
 		type: "id",
 		data: {player_id: unique_counter}
@@ -101,7 +106,17 @@ wss.on('connection', (client) => {
 	      if(message.data.down){
 	          client.y_position+=5;
 	      }
+				if (client.x_position < 0) client.x_position = 0;
+				if (client.x_position+client.width > WORLD_SIZE*WORLD_UNIT)
+					client.x_position = WORLD_SIZE*WORLD_UNIT - client.width;
+				if (client.y_position < 0) client.y_position = 0;
+				if (client.y_position+client.height > WORLD_SIZE*WORLD_UNIT)
+					client.y_position = WORLD_SIZE*WORLD_UNIT - client.height;
 	  }
+		else if (message.type == "player info") {
+			client.width = message.data.width;
+			client.height = message.data.height;
+		}
 	  else {
 	    console.log("Following message received from client: \n");
 	    console.log(message);
