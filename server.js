@@ -4,6 +4,9 @@ const app = express();
 const http = require('http');
 const url = require('url');
 const WebSocket = require('ws');
+const { spawn } = require('child_process');
+const WORLD_UNIT = 16;
+const WORLD_SIZE = 4000;
 
 var port = process.env.PORT || 3000;
 const server = http.createServer(app);
@@ -86,6 +89,8 @@ wss.on('connection', (client) => {
 	client.unique_id = unique_counter;
 	client.x_position = 32000;
 	client.y_position = 32000;
+	client.width = 0;
+	client.height = 0;
 	var player_data = {
 		type: "id",
 		data: {player_id: unique_counter}
@@ -96,6 +101,7 @@ wss.on('connection', (client) => {
 
 	// When message is received from client
 	client.on('message', (msg) => {
+<<<<<<< HEAD
 		var message = JSON.parse(msg);
 
 		if(message.type == 'input'){
@@ -117,6 +123,39 @@ wss.on('connection', (client) => {
 			console.log(message);
 			wss.broadcast(msg);
 		}
+=======
+	  var message = JSON.parse(msg);
+
+	  if(message.type == "input"){
+	      if(message.data.left){
+	          client.x_position-=5;
+	      }
+	      if(message.data.up){
+	          client.y_position-=5;
+	      }
+	      if(message.data.right){
+	          client.x_position+=5;
+	      }
+	      if(message.data.down){
+	          client.y_position+=5;
+	      }
+				if (client.x_position < 0) client.x_position = 0;
+				if (client.x_position+client.width > WORLD_SIZE*WORLD_UNIT)
+					client.x_position = WORLD_SIZE*WORLD_UNIT - client.width;
+				if (client.y_position < 0) client.y_position = 0;
+				if (client.y_position+client.height > WORLD_SIZE*WORLD_UNIT)
+					client.y_position = WORLD_SIZE*WORLD_UNIT - client.height;
+	  }
+		else if (message.type == "player info") {
+			client.width = message.data.width;
+			client.height = message.data.height;
+		}
+	  else {
+	    console.log("Following message received from client: \n");
+	    console.log(message);
+	    wss.broadcast(msg);
+	  }
+>>>>>>> 3403c64c8487e4327d39d2a3027f461d16f6ffa7
 	});
 
 	// Error handling
