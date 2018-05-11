@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		let canvas = document.getElementById('game');
 		let names_canvas = document.getElementById('names');
 		let gui_canvas = document.getElementById('gui');
-		canvas.width = window.innerWidth, canvas.height = window.innerHeight;
+		canvas.width = window.innerWidth, canvas.height = window.innerHeight - $('#chat-history').height();
 		names_canvas.width = window.innerWidth, names_canvas.height = window.innerHeight;
 		gui_canvas.width = window.innerWidth, gui_canvas.height = window.innerHeight;
 		let ctx = canvas.getContext('2d');
@@ -46,6 +46,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			player.load_animation('walk_e', player_walk_e, 1);
 			player.x = 32000;
 			player.y = 32000;
+			let data = {
+				type: "player info",
+				data: {width: player.width,
+							 height: player.height}
+			};
+			ws.send(JSON.stringify(data));
 
 			manager = new GameManager(ctx, names_ctx, gui_ctx, canvas.width,
 																canvas.height, player);

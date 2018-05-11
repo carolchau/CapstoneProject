@@ -4,7 +4,6 @@ import {WORLD_UNIT, WORLD_SIZE, CHUNK_SIZE, FPS, cached_assets} from './constant
 import {StaticObject, AnimatedObject, Player} from './objects.js';
 
 
-
 // Main game manager for the game (should only have one instance)
 // Takes care of all updates and drawing
 export class GameManager {
@@ -31,6 +30,8 @@ export class GameManager {
 
 		this._objects = {};
 		this._chunks = {};
+
+		this._initial_draw = true;
 	}
 
 	// Add or remove object from list of gameobjects
@@ -55,6 +56,12 @@ export class GameManager {
 		this.viewrect_y = this.player.y - this._can_height/2;
 		this.viewrect_right = this.viewrect_x + this._can_width;
 		this.viewrect_bot = this.viewrect_y + this._can_height;
+		if (this.viewrect_x < 0) this.viewrect_x = 0;
+		if (this.viewrect_right > WORLD_SIZE*WORLD_UNIT)
+			this.viewrect_x = WORLD_SIZE*WORLD_UNIT - this._can_width;
+		if (this.viewrect_y < 0) this.viewrect_y = 0;
+		if (this.viewrect_bot > WORLD_SIZE*WORLD_UNIT)
+			this.viewrect_y = WORLD_SIZE*WORLD_UNIT - this._can_height;
 
 		// clearing and refilling background
 		let object_keys = Object.keys(this._objects);
@@ -97,9 +104,16 @@ export class GameManager {
 		for (let i = 0; i < x_range; i++) {
 			for (let j = 0; j < y_range; j++) {
 				let chunk_id_x = x_left_chunk + i, chunk_id_y = y_top_chunk + j;
-				let chunk_id = chunk_id_x + ',' + chunk_id_y;
-				if (this.player.stopped_moving || (!filled_chunks[chunk_id] && this.player.moved)) {
-					this._chunks[chunk_id].draw(this._ctx, this.viewrect_x, this.viewrect_y);
+				if (chunk_id_x >= 0 && chunk_id_x < WORLD_SIZE*WORLD_UNIT/CHUNK_SIZE &&
+					  chunk_id_y >= 0 && chunk_id_y < WORLD_SIZE*WORLD_UNIT/CHUNK_SIZE) {
+					let chunk_id = chunk_id_x + ',' + chunk_id_y;
+					if (this._initial_draw) {
+						this._chunks[chunk_id].draw(this._ctx, this.viewrect_x, this.viewrect_y);
+						this._initial_draw = false;
+					}
+					else if (this.player.stopped_moving || (!filled_chunks[chunk_id] && this.player.moved)) {
+						this._chunks[chunk_id].draw(this._ctx, this.viewrect_x, this.viewrect_y);
+					}
 				}
 			}
 		}
@@ -152,15 +166,18 @@ export class GameManager {
 		for (let i = 0; i < x_range; i++) {
 			for (let j = 0; j < y_range; j++) {
 				let chunk_id_x = x_left_chunk + i, chunk_id_y = y_top_chunk + j;
-				let chunk_id = chunk_id_x + ',' + chunk_id_y;
-				let ch_x_left = x_left_chunk*CHUNK_SIZE + i*CHUNK_SIZE;
-				let ch_y_top = y_top_chunk*CHUNK_SIZE + j*CHUNK_SIZE;
+				if (chunk_id_x >= 0 && chunk_id_x < WORLD_SIZE*WORLD_UNIT/CHUNK_SIZE &&
+					  chunk_id_y >= 0 && chunk_id_y < WORLD_SIZE*WORLD_UNIT/CHUNK_SIZE) {
+					let chunk_id = chunk_id_x + ',' + chunk_id_y;
+					let ch_x_left = x_left_chunk*CHUNK_SIZE + i*CHUNK_SIZE;
+					let ch_y_top = y_top_chunk*CHUNK_SIZE + j*CHUNK_SIZE;
 
-				// if the chunk isn't generated yet, generate it
-				if (this._chunks[chunk_id] == null) {
-					let chunk = new WorldChunk(ch_x_left, ch_y_top);
-					chunk.gen(chunk_id);
-					this._chunks[chunk_id] = chunk;
+					// if the chunk isn't generated yet, generate it
+					if (this._chunks[chunk_id] == null) {
+						let chunk = new WorldChunk(ch_x_left, ch_y_top);
+						chunk.gen(chunk_id);
+						this._chunks[chunk_id] = chunk;
+					}
 				}
 			}
 		}
