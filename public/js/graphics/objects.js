@@ -10,7 +10,6 @@ class GameObject {
 		this._sprites = {};
 		this._x = 0, this._y = 0;
 		this._width = 0, this._height = 0;
-
 	}
 
 	// Getters and setters
@@ -25,8 +24,8 @@ class GameObject {
 
 	// AABB collision true/false
 	is_visible (v_left, v_right, v_top, v_bot) {
-		return (v_left < this._x_right && v_right > this._x_left &&
-						v_top < this._y_bot && v_bot > this._y_top);
+		return (v_left < this._x + this._width && v_right > this._x &&
+						v_top < this._y + this._height && v_bot > this._y);
 	}
 }
 
@@ -74,7 +73,7 @@ export class AnimatedObject extends GameObject {
 	// check if object moved
 	update () {
 		let moved = this._moved;
-		this._moved = (this._x - this._last_x_pos != 0 || this._y - this._last_y_pos != 0);
+		this._moved = (this._x != this._last_x_pos || this._y != this._last_y_pos);
 		this._stopped_moving = this._moved != moved;
 	}
 
@@ -132,7 +131,10 @@ export class Player extends AnimatedObject {
 	constructor (id) {
 		super(id);
 		this._idle = true;
+		this._type = 'player';
 	}
+
+	get type () { return this._type; }
 
 	// play different animations depending on movement direction
 	update () {

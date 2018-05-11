@@ -2,12 +2,20 @@ import {GameManager, AssetManager} from './graphics/managers.js';
 import {Player} from './graphics/objects.js';
 
 document.addEventListener("DOMContentLoaded", function(event) {
-		let player = new Player('player');
-		let manager = null;
-
 		let canvas = document.getElementById('game');
+		let names_canvas = document.getElementById('names');
+		let gui_canvas = document.getElementById('gui');
 		canvas.width = window.innerWidth, canvas.height = window.innerHeight;
+		names_canvas.width = window.innerWidth, names_canvas.height = window.innerHeight;
+		gui_canvas.width = window.innerWidth, gui_canvas.height = window.innerHeight;
 		let ctx = canvas.getContext('2d');
+		let names_ctx = document.getElementById('names').getContext('2d');
+		let gui_ctx = document.getElementById('gui').getContext('2d');
+	  names_ctx.font = "10px Arial";
+	  gui_ctx.font = "10px Arial";
+
+	  let player = new Player('player');
+		let manager = null;
 
 	  // Make WebSocket connection
     let ws = new WebSocket('ws://' + window.location.hostname + ':' + window.location.port);
@@ -39,7 +47,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			player.x = 32000;
 			player.y = 32000;
 
-			manager = new GameManager(ctx, canvas.width, canvas.height, player);
+			manager = new GameManager(ctx, names_ctx, gui_ctx, canvas.width,
+																canvas.height, player);
 			manager.gen_around_player();
 			manager.start();
 		});

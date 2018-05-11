@@ -8,12 +8,16 @@ import {StaticObject, AnimatedObject, Player} from './objects.js';
 // Main game manager for the game (should only have one instance)
 // Takes care of all updates and drawing
 export class GameManager {
-	// ctx (canvas context): the canvas context to draw on
+	// game_ctx (canvas context): the canvas context to draw game elements on
+	// names_ctx (canvas context): the canvas context to draw player names on
+	// gui_ctx (canvas context): the canvas context to draw gui elements on
 	// width (int): width of the canvas
 	// height (int): height of the canvas
 	// player (Player): active player
-	constructor (ctx, width, height, player) {
-		this._ctx = ctx;
+	constructor (game_ctx, names_ctx, gui_ctx, width, height, player) {
+		this._ctx = game_ctx;
+		this._names_ctx = names_ctx;
+		this._gui_ctx = gui_ctx;
 		this._can_width = width;
 		this._can_height = height;
 		this.player = player;
@@ -100,14 +104,26 @@ export class GameManager {
 			}
 		}
 
+		this._names_ctx.clearRect(0,0,this._can_width, this._can_height);
 		// object drawing
 		for (let i = 0; i < num_of_objects; i++) {
-			this._objects[object_keys[i]].draw(this._ctx, this.viewrect_x, this.viewrect_y);
+			let obj = this._objects[object_keys[i]];
+			if (obj.is_visible(this.viewrect_x, this.viewrect_right, this.viewrect_y,
+												 this.viewrect_bot)) {
+				obj.draw(this._ctx, this.viewrect_x, this.viewrect_y);
+				if (obj.type == 'player') {
+					this._names_ctx.fillText(obj.id, obj.x - obj.width/2 - this.viewrect_x,
+																	 obj.y - 10 - this.viewrect_y);
+				}
+			}
 			this._objects[object_keys[i]].postdraw();
 		}
 
 		// draw player
 		this.player.draw(this._ctx, this.viewrect_x, this.viewrect_y);
+		this._names_ctx.fillText(this.player.id,
+														 this.player.x - this.player.width/2 - this.viewrect_x,
+														 this.player.y - 10 - this.viewrect_y);
 		this.player.postdraw();
 	}
 
@@ -145,7 +161,6 @@ export class GameManager {
 					let chunk = new WorldChunk(ch_x_left, ch_y_top);
 					chunk.gen(chunk_id);
 					this._chunks[chunk_id] = chunk;
-					console.log('genned', chunk_id)
 				}
 			}
 		}
@@ -183,7 +198,6 @@ export class AssetManager {
 		}
 	}
 }
-
 
 
 // Square background tile of defined size that is rendered in a single
