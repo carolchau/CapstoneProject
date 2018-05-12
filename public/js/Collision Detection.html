@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<style>
+canvas {
+    border:1px solid #d3d3d3;
+    background-color: #f1f1f1;
+}
+</style>
+</head>
+<body onload="startGame()">
+<script>
+
+var Player;
+var Obstacle =[];
+var Hat = [];
+
+var Plimg = new Image(); 
+var rock  = new Image();
+var lamp  = new Image();
+var tree = new Image();
+var home  = new Image(); 
+    
+Plimg.src = 'player.png';    
+rock.src  = 'rock.png';
+lamp.src  = 'lamp.png';
+tree.src = 'long tree.png';
+home.src  = 'home.png';
+
+function startGame() {
+    GameArea.start();
+    Player      = new component(Plimg, 10, 120);
+    Obstacle[0] = new component(rock, 120, 120);
+    Obstacle[1] = new component(tree, 160, 120);
+    Obstacle[2] = new component(lamp, 200, 120);
+    Obstacle[3] = new component(home, 240, 120);
+    Hat[0]      = new component(rock,120,60);
+}
+
+var GameArea = {
+    canvas : document.createElement("canvas"),
+    start : function() {
+        this.canvas.width = 480;
+        this.canvas.height = 270;
+        this.context = this.canvas.getContext("2d");
+        document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+        this.interval = setInterval(updateGameArea, 20);
+        window.addEventListener('keydown', function (e) {
+            GameArea.key = e.keyCode;
+        })
+        window.addEventListener('keyup', function (e) {
+            GameArea.key = false;
+        })
+    }, 
+    clear : function(){
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+}
+
+function component(img, x, y) {
+    this.gamearea = GameArea;
+    if(img == Plimg ){
+        this.width = 16;
+        this.height = 22;
+       }
+    else if(img == rock ){
+        this.width = 15;
+        this.height = 15;
+       }
+    else if(img == tree ){
+        this.width = 16;
+        this.height = 15;
+       }
+    else if(img == lamp ){
+        this.width = 11;
+        this.height = 14;
+       }
+    else if(img == home ){
+        this.width = 48;
+        this.height = 48;
+       }
+    
+    this.speedX = 0;
+    this.speedY = 0;    
+    this.x = x;
+    this.y = y;    
+    this.update = function() {
+        ctx = GameArea.context;
+        if(img == tree || img == lamp || img == home ){
+            ctx.drawImage(img,this.x,this.y - 16);
+       }
+        else{
+        ctx.drawImage(img,this.x,this.y);
+        }  
+    }
+    this.newPos = function() {
+        this.x += this.speedX;
+        this.y += this.speedY;        
+    }
+    this.pickUp = function() {
+        this.height = 0;
+        this.width = 0;
+        this.x = -100;
+        this.y = -100;
+    }
+    this.crashWith = function(otherobj) {
+        var playerleft = this.x;
+        var playerright = this.x + (this.width);
+        var playertop = this.y;
+        var playerbottom = this.y + (this.height);
+        var otherleft = otherobj.x;
+        var otherright = otherobj.x + (otherobj.width);
+        var othertop = otherobj.y;
+        var otherbottom = otherobj.y + (otherobj.height);
+        var crash = false;
+        
+        if ((playerbottom > othertop) && (playertop < otherbottom) && (playerleft <= otherright) && (playerright >= otherright + 13) ) {
+        crash =true;
+        this.x = otherright; 
+        }
+        else if ((playerbottom > otherbottom + 15) && (playertop < otherbottom) && (playerright >= otherleft) && (playerleft <= otherright)) {
+        crash =true;       
+        this.y = otherbottom; 
+        }
+        else if ((playerbottom > othertop) && (playertop < othertop - 15) && (playerright >= otherleft) && (playerleft <= otherright)) {
+        crash =true;       
+        this.y = othertop - 22; 
+        }
+        else if ((playerbottom > othertop) && (playertop < otherbottom) && (playerright >= otherleft) && (playerleft <= otherleft)) {
+        crash =true;       
+        this.x = otherleft - 16; 
+        }
+        return crash;
+    }
+}
+
+function updateGameArea() {  
+    GameArea.clear();
+    Player.speedX = 0;
+    Player.speedY = 0;  
+    if (GameArea.key && GameArea.key == 37 || GameArea.key && GameArea.key == 65) {Player.speedX = -3; }
+    if (GameArea.key && GameArea.key == 39 || GameArea.key && GameArea.key == 68) {Player.speedX = 3; }
+    if (GameArea.key && GameArea.key == 38 || GameArea.key && GameArea.key == 87) {Player.speedY = -3; }
+    if (GameArea.key && GameArea.key == 40 || GameArea.key && GameArea.key == 83) {Player.speedY = 3; }
+    Player.update();
+    for (i = 0; i < 4; i ++) {
+        Player.crashWith(Obstacle[i]); 
+        Obstacle[i].update();
+    }
+    for (i = 0; i < 1; i ++) {
+        if(Player.crashWith(Hat[i])){
+           Hat[i].pickUp();
+        } 
+        else {
+            Hat[i].update();
+        }
+    }
+    Player.newPos();     
+}
+</script>
+</body>
+</html>
