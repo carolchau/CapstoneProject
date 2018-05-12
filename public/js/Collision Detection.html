@@ -10,24 +10,28 @@ canvas {
 </style>
 </head>
 <body onload="startGame()">
+    
+    
 <script>
 
+//Three variable types used for collision
 var Player;
 var Obstacle =[];
 var Hat = [];
 
+//Image variables   
 var Plimg = new Image(); 
 var rock  = new Image();
 var lamp  = new Image();
 var tree = new Image();
-var home  = new Image(); 
-    
+var home  = new Image();     
 Plimg.src = 'player.png';    
 rock.src  = 'rock.png';
 lamp.src  = 'lamp.png';
 tree.src = 'long tree.png';
 home.src  = 'home.png';
 
+//This is where the variables are placed on the map
 function startGame() {
     GameArea.start();
     Player      = new component(Plimg, 10, 120);
@@ -38,6 +42,8 @@ function startGame() {
     Hat[0]      = new component(rock,120,60);
 }
 
+    
+//Initializing the map
 var GameArea = {
     canvas : document.createElement("canvas"),
     start : function() {
@@ -58,6 +64,11 @@ var GameArea = {
     }
 }
 
+/*
+Function used for all collision variables
+takes in one of (currently three) image types (rock, tree,lamp & home), as well as the x & y coordinates
+in the case of tree,lamp & home the images will appear 16 pixels higher than the y coordinate. This is so the player does not collide with the very top
+*/
 function component(img, x, y) {
     this.gamearea = GameArea;
     if(img == Plimg ){
@@ -104,6 +115,8 @@ function component(img, x, y) {
         this.x = -100;
         this.y = -100;
     }
+    
+//    Function used to determine & correct a collision
     this.crashWith = function(otherobj) {
         var playerleft = this.x;
         var playerright = this.x + (this.width);
@@ -135,6 +148,7 @@ function component(img, x, y) {
     }
 }
 
+//Allows player control & updates player position    
 function updateGameArea() {  
     GameArea.clear();
     Player.speedX = 0;
@@ -158,6 +172,12 @@ function updateGameArea() {
     }
     Player.newPos();     
 }
+      
 </script>
+    
+<p><strong>Note:</strong> The top rock is supposed to be a hat, I just don't have an image for one at the moment.</p>    
+    
 </body>
+    
+    
 </html>
