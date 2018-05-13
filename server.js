@@ -62,22 +62,14 @@ var unique_counter = 0;
 
 setInterval(function() {
 	var data = {
-<<<<<<< HEAD
-		type: 'world_data'
-	};
-	for (let client of wss.clients) {
-		data[client.unique_id] = {
-			x_position: client.x_position,
-			y_position: client.y_position
-		};
-=======
 		type: "world_data",
-        data: {}
+    data: {}
 	};
 	for (let client of wss.clients) {
-		data["data"][client.unique_id] = {x_position: client.x_position,
-		                                  y_position: client.y_position};
->>>>>>> b4bc1dce0bb6fc89b24b814d6863913c65d0733b
+		data["data"][client.unique_id] = {
+			x_position: client.x_position,
+		  y_position: client.y_position
+		};
 	}
 	wss.broadcast(JSON.stringify(data));
 }, 50);
@@ -101,29 +93,6 @@ wss.on('connection', (client) => {
 
 	// When message is received from client
 	client.on('message', (msg) => {
-<<<<<<< HEAD
-		var message = JSON.parse(msg);
-
-		if(message.type == 'input'){
-			if(message.left){
-				client.x_position-=5;
-			}
-			if(message.up){
-				client.y_position-=5;
-			}
-			if(message.right){
-				client.x_position+=5;
-			}
-			if(message.down){
-				client.y_position+=5;
-			}
-		}
-		else {
-			console.log('Following message received from client: \n');
-			console.log(message);
-			wss.broadcast(msg);
-		}
-=======
 	  var message = JSON.parse(msg);
 
 	  if(message.type == "input"){
@@ -155,7 +124,6 @@ wss.on('connection', (client) => {
 	    console.log(message);
 	    wss.broadcast(msg);
 	  }
->>>>>>> 3403c64c8487e4327d39d2a3027f461d16f6ffa7
 	});
 
 	// Error handling
