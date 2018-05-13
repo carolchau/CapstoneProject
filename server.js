@@ -63,18 +63,20 @@ var unique_counter = 0;
 setInterval(function() {
 	var data = {
 		type: "world_data",
-        data: {}
+    data: {}
 	};
 	for (let client of wss.clients) {
-		data["data"][client.unique_id] = {x_position: client.x_position,
-		                                  y_position: client.y_position};
+		data["data"][client.unique_id] = {
+			x_position: client.x_position,
+		  y_position: client.y_position
+		};
 	}
 	wss.broadcast(JSON.stringify(data));
 }, 50);
 
 // Listen in on every WebSocket connection
 wss.on('connection', (client) => {
-	console.log("Dab for the new connection \n");
+	console.log('Dab for the new connection \n');
 
 	client.unique_id = unique_counter;
 	client.x_position = 32000;
@@ -126,7 +128,7 @@ wss.on('connection', (client) => {
 
 	// Error handling
 	client.on('error', (error) => {
-	  console.log('An Error has occurred: \n' + error);
+		console.log('An Error has occurred: \n' + error);
 	});
 
 	// Client disconnect
