@@ -236,3 +236,7 @@ wss.broadcast = function broadcast(data) {
 server.listen(port, () => {
 	console.log('The magic happens on port ' + port);
 });
+
+exports.closeServer = function(){
+	    server.close();
+};
