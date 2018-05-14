@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "lint": "eslint **/*.js --fix",
-    "test": "mocha || true",
+    "test": "mocha --exit",
     "start": "nodemon server"
   },
   "repository": {
