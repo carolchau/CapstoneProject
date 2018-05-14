@@ -94,7 +94,6 @@ export class AnimatedObject extends GameObject {
 	// img_name (array): list of srite names for the animation
 	// animation_length (int): length of animation in seconds
 	load_animation (anim_name, img_names, pos_list, sw, sh, animation_length) {
-		console.log(arguments)
 		pos_list = pos_list || [];
 		let names_length = img_names.length, pos_length = pos_list.length;
 		let length = (names_length >= pos_length) ? names_length : pos_length;
@@ -117,7 +116,6 @@ export class AnimatedObject extends GameObject {
 			};
 			this._sprites[anim_name].push(new_img);
 		}
-		console.log('new', anim_name, this._sprites[anim_name].length, sw, sh)
 		this._width = sw || cached_assets[img_names[0]].width;
 		this._height = sh || cached_assets[img_names[0]].height;
 		// sprite change time in milliseconds
@@ -128,7 +126,6 @@ export class AnimatedObject extends GameObject {
 	// play animation with name anim_name
 	// anim_name (str): animation name
 	play_anim (anim_name) {
-		console.log('playing idle')
 		clearInterval(this._anim);
 		this._current_sprite[0] = anim_name;
 		this._current_sprite[1] = 0;
@@ -141,7 +138,6 @@ export class AnimatedObject extends GameObject {
 	}
 
 	draw (ctx, ctx_left, ctx_top) {
-		console.log('drawing', this._width, this._height)
 		ctx.drawImage(
 			this._sprites[this._current_sprite[0]][this._current_sprite[1]].img,
 			this._sprites[this._current_sprite[0]][this._current_sprite[1]].x,
