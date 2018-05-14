@@ -11,7 +11,7 @@ describe('Server Test', function () {
 	});
 
 	describe('GET /', function() {
-		it('should return status code 200', function() {
+		it('should return status code 200', function(done) {
 			request.get(base_url, function(error, response, body) {
 				assert.equal(200, response.statusCode);
 				done();
