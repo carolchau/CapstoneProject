@@ -13,8 +13,8 @@ class GameObject {
 	}
 
 	// Getters and setters
-	get id () { return this._id; }
-	set id (id) {this._id = id; }
+	get id () {return this._id;}
+	set id (id) {this._id = id;}
 	get x () {return this._x;}
 	set x (x) {this._x = x;}
 	get y () {return this._y;}
