@@ -78,6 +78,7 @@ export class GameManager {
 				// check if each animated object moved and is visible
 				if ((obj.moved || obj.stopped_moving) && !(Math.abs(clear_x) > this._can_width || Math.abs(clear_y) > this._can_height)) {
 					//clear rectangle only around moving object
+					console.log(x_left, y_top, x_right, y_bot)
 					let chunk_x_ids = [Math.floor(x_left/CHUNK_SIZE), Math.floor(x_right/CHUNK_SIZE)];
 					let chunk_y_ids = [Math.floor(y_top/CHUNK_SIZE), Math.floor(y_bot/CHUNK_SIZE)];
 					for (let x_id = 0; x_id < 2; x_id++) {

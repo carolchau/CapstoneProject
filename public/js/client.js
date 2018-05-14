@@ -22,28 +22,18 @@ document.addEventListener("DOMContentLoaded", function(event) {
     ws.onopen = () => { console.log("Connected to server!"); }
 
 		let asset_manager = new AssetManager();
-		let img_list = [];
-		let player_stand_n = ['img/Player/standN.png'];
-		let player_stand_s = ['img/Player/standS.png'];
-		let player_stand_w = ['img/Player/standW.png'];
-		let player_stand_e = ['img/Player/standE.png'];
-		let player_walk_n = ['img/Player/walk1N.png','img/Player/walk2N.png'];
-		let player_walk_s = ['img/Player/walk1S.png','img/Player/walk2S.png'];
-		let player_walk_w = ['img/Player/walk1W.png','img/Player/walk2W.png'];
-		let player_walk_e = ['img/Player/walk1E.png','img/Player/walk2E.png'];
-		img_list = img_list.concat(player_stand_n, player_stand_s, player_stand_w,
-															 player_stand_e, player_walk_n, player_walk_s,
-															 player_walk_w, player_walk_e);
+		let spritesheet = ['img/sheet.png'];
+		let img_list = [spritesheet];
 
 		asset_manager.load_images(img_list, () => {
-			player.load_animation('idle_n', player_stand_n, 0);
-			player.load_animation('idle_s', player_stand_s, 0);
-			player.load_animation('idle_w', player_stand_w, 0);
-			player.load_animation('idle_e', player_stand_e, 0);
-			player.load_animation('walk_n', player_walk_n, 1);
-			player.load_animation('walk_s', player_walk_s, 1);
-			player.load_animation('walk_w', player_walk_w, 1);
-			player.load_animation('walk_e', player_walk_e, 1);
+			player.load_animation('idle_n', spritesheet, [[0,0]], 14, 21, 0);
+			player.load_animation('idle_s', spritesheet, [[14,0]], 14, 21, 0);
+			player.load_animation('idle_w', spritesheet, [[28,0]], 14, 21, 0);
+			player.load_animation('idle_e', spritesheet, [[42,0]], 14, 21, 0);
+			player.load_animation('walk_n', spritesheet, [[0,21],[14,21]], 14, 21, 1);
+			player.load_animation('walk_s', spritesheet, [[28,21],[42,21]], 14, 21, 1);
+			player.load_animation('walk_w', spritesheet, [[56,21],[70,21]], 14, 21, 1);
+			player.load_animation('walk_e', spritesheet, [[84,21],[98,21]], 14, 21, 1);
 			player.x = 32000;
 			player.y = 32000;
 			let data = {
@@ -143,14 +133,14 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     } else {
                         if (manager._objects[id] == null) {
                             let new_player = new Player(id);
-                            new_player.load_animation('idle_n', player_stand_n, 0);
-                            new_player.load_animation('idle_s', player_stand_s, 0);
-                            new_player.load_animation('idle_w', player_stand_w, 0);
-                            new_player.load_animation('idle_e', player_stand_e, 0);
-                            new_player.load_animation('walk_n', player_walk_n, 1);
-                            new_player.load_animation('walk_s', player_walk_s, 1);
-                            new_player.load_animation('walk_w', player_walk_w, 1);
-                            new_player.load_animation('walk_e', player_walk_e, 1);
+														new_player.load_animation('idle_n', spritesheet, [[0,0]], 14, 21, 0);
+														new_player.load_animation('idle_s', spritesheet, [[14,0]], 14, 21, 0);
+														new_player.load_animation('idle_w', spritesheet, [[28,0]], 14, 21, 0);
+														new_player.load_animation('idle_e', spritesheet, [[42,0]], 14, 21, 0);
+														new_player.load_animation('walk_n', spritesheet, [[0,21],[14,21]], 14, 21, 1);
+														new_player.load_animation('walk_s', spritesheet, [[28,21],[42,21]], 14, 21, 1);
+														new_player.load_animation('walk_w', spritesheet, [[56,21],[70,21]], 14, 21, 1);
+														new_player.load_animation('walk_e', spritesheet, [[84,21],[98,21]], 14, 21, 1);
                             new_player.x = message.data[int_id].x_position;
                             new_player.y = message.data[int_id].y_position;
                             manager.add_object(new_player);

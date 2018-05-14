@@ -77,8 +77,8 @@ wss.on('connection', (client) => {
 	console.log("Dab for the new connection \n");
 
 	client.unique_id = unique_counter;
-	client.x_position = 32000;
-	client.y_position = 32000;
+	client.x_position = 63000;
+	client.y_position = 63000;
 	client.width = 0;
 	client.height = 0;
 	var player_data = {
@@ -108,10 +108,10 @@ wss.on('connection', (client) => {
 	      }
 				if (client.x_position < 0) client.x_position = 0;
 				if (client.x_position+client.width > WORLD_SIZE*WORLD_UNIT)
-					client.x_position = WORLD_SIZE*WORLD_UNIT - client.width;
+					client.x_position = WORLD_SIZE*WORLD_UNIT - client.width - 1;
 				if (client.y_position < 0) client.y_position = 0;
 				if (client.y_position+client.height > WORLD_SIZE*WORLD_UNIT)
-					client.y_position = WORLD_SIZE*WORLD_UNIT - client.height;
+					client.y_position = WORLD_SIZE*WORLD_UNIT - client.height - 1;
 	  }
 		else if (message.type == "player info") {
 			client.width = message.data.width;
