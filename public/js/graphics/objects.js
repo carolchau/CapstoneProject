@@ -34,19 +34,23 @@ class GameObject {
 export class StaticObject extends GameObject {
 	// Load img for img_name. Only one image can be loaded for a static object
 	// return false if load fails, else return true
-	load_sprite (img_name) {
+	load_sprite (img_name, sx, sy, sw, sh) {
 		if (cached_assets[img_name] == null) return false;
 		this._sprites['idle'] = [];
 		this._sprites['idle'][0] = cached_assets[img_name];
-		this._width = cached_assets[img_name].width;
-		this._height = cached_assets[img_name].height;
+		this._sx = sx || 0;
+		this._xy = sy || 0;
+		this._width = sw || cached_assets[img_name].width;
+		this._height = sh || cached_assets[img_name].height;
 		return true;
 	}
 
 	// Draw sprite at x,y position of object
 	draw (ctx, ctx_left, ctx_top) {
 		// offset position by viewrect, so drawn relative to viewrect
-		ctx.drawImage(this._sprites['idle'][0], this._x - ctx_left, this._y - ctx_top);
+		ctx.drawImage(this._sprites['idle'][0], this._sx, this._sy, this._width,
+			            this._height, this._x - ctx_left, this._y - ctx_top,
+									this._width, this._height);
 	}
 }
 
@@ -89,15 +93,31 @@ export class AnimatedObject extends GameObject {
 	// anim_name (str): name of animation
 	// img_name (array): list of srite names for the animation
 	// animation_length (int): length of animation in seconds
-	load_animation (anim_name, img_names, animation_length) {
-		let length = img_names.length;
-		this._sprites[anim_name] = [];
+	load_animation (anim_name, img_names, pos_list, sw, sh, animation_length) {
+		pos_list = pos_list || [];
+		let names_length = img_names.length, pos_length = pos_list.length;
+		let length = (names_length >= pos_length) ? names_length : pos_length;
+		if (this._sprites[anim_name] == undefined)
+			this._sprites[anim_name] = [];
 		for (let i = this._sprites[anim_name].length; i < length; i++) {
-			if (cached_assets[img_names[i]] == null) return false;
-			this._sprites[anim_name].push(cached_assets[img_names[i]]);
-			this._width = cached_assets[img_names[i]].width;
-			this._height = cached_assets[img_names[i]].height;
+			let img_i = i, pos_i = i;
+			if (i >= names_length) img_i = names_length - 1;
+			if (i >= pos_length) pos_i = pos_length - 1;
+
+
+			let sx = pos_list[i] || 0;
+			if (sx != 0) sx = sx[0];
+			let sy = pos_list[i] || 0;
+			if (sy != 0) sy = sy[1];
+			let new_img = {
+				img: cached_assets[img_names[img_i]],
+				x: sx,
+				y: sy
+			};
+			this._sprites[anim_name].push(new_img);
 		}
+		this._width = sw || cached_assets[img_names[0]].width;
+		this._height = sh || cached_assets[img_names[0]].height;
 		// sprite change time in milliseconds
 		this._sprite_change_time = (animation_length/length)*1000;
 		return true;
@@ -119,8 +139,11 @@ export class AnimatedObject extends GameObject {
 
 	draw (ctx, ctx_left, ctx_top) {
 		ctx.drawImage(
-			this._sprites[this._current_sprite[0]][this._current_sprite[1]],
-			this._x - ctx_left, this._y - ctx_top);
+			this._sprites[this._current_sprite[0]][this._current_sprite[1]].img,
+			this._sprites[this._current_sprite[0]][this._current_sprite[1]].x,
+			this._sprites[this._current_sprite[0]][this._current_sprite[1]].y,
+			this._width, this._height, this._x - ctx_left, this._y - ctx_top,
+			this._width, this._height);
 	}
 }
 
@@ -186,11 +209,33 @@ export class Player extends AnimatedObject {
 	}
 
 	// make sure animation name is one of the following in if statement
-	load_animation (anim_name, img_names, animation_length) {
+	load_animation (anim_name, img_names, pos_list, sw, sh, animation_length) {
 		if (anim_name != 'idle_n' && anim_name != 'idle_s' &&
 				anim_name != 'idle_w' && anim_name != 'idle_e' &&
 				anim_name != 'walk_n' && anim_name != 'walk_s' &&
 				anim_name != 'walk_w' && anim_name != 'walk_e') return;
-		super.load_animation(anim_name, img_names, animation_length);
+		super.load_animation(anim_name, img_names, pos_list, sw, sh, animation_length);
+	}
+}
+
+
+export class AIObject extends Player {
+	constructor(id) {
+		super(id);
+		this._type = 'creature';
+		//this.load_animation('idle_n', , 0);
+		//this.load_animation('idle_s', , 0);
+		//this.load_animation('idle_w', , 0);
+		//this.load_animation('idle_e', , 0);
+		//this.load_animation('walk_n', , 1);
+		//this.load_animation('walk_s', , 1);
+		//this.load_animation('walk_w', , 1);
+		//this.load_animation('walk_e', , 1);
+	}
+
+	update () {
+		this._x = generator.get_val(this._x);
+		this._y = generator.get_val(this._y);
+		super.update();
 	}
 }
