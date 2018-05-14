@@ -1,20 +1,20 @@
 {
-	"count": 5,
+	"count": 20,
 	"hat_0": {
 		"sx": 0,
-		"sy": 106,
+		"sy": 105,
 		"width": 11,
 		"height": 9
 	},
 	"hat_1": {
 		"sx": 0,
-		"sy": 115,
+		"sy": 114,
 		"width": 13,
 		"height": 11
 	},
 	"hat_2": {
 		"sx": 13,
-		"sy": 115,
+		"sy": 114,
 		"width": 13,
 		"height": 11
 	},
@@ -28,6 +28,96 @@
 		"sx": 15,
 		"sy": 126,
 		"width": 15,
+		"height": 11
+	},
+	"hat_5": {
+		"sx": 0,
+		"sy": 137,
+		"width": 15,
+		"height": 12
+	},
+	"hat_6": {
+		"sx": 15,
+		"sy": 137,
+		"width": 15,
+		"height": 12
+	},
+	"hat_7": {
+		"sx": 0,
+		"sy": 149,
+		"width": 15,
+		"height": 14
+	},
+	"hat_8": {
+		"sx": 0,
+		"sy": 163,
+		"width": 16,
+		"height": 15
+	},
+	"hat_9": {
+		"sx": 16,
+		"sy": 163,
+		"width": 16,
+		"height": 15
+	},
+	"hat_10": {
+		"sx": 0,
+		"sy": 178,
+		"width": 17,
+		"height": 11
+	},
+	"hat_11": {
+		"sx": 30,
+		"sy": 137,
+		"width": 15,
+		"height": 12
+	},
+	"hat_12": {
+		"sx": 45,
+		"sy": 137,
+		"width": 15,
+		"height": 12
+	},
+	"hat_13": {
+		"sx": 60,
+		"sy": 137,
+		"width": 15,
+		"height": 12
+	},
+	"hat_14": {
+		"sx": 17,
+		"sy": 178,
+		"width": 17,
+		"height": 11
+	},
+	"hat_15": {
+		"sx": 0,
+		"sy": 189,
+		"width": 17,
+		"height": 12
+	},
+	"hat_16": {
+		"sx": 0,
+		"sy": 201,
+		"width": 17,
+		"height": 14
+	},
+	"hat_17": {
+		"sx": 17,
+		"sy": 201,
+		"width": 17,
+		"height": 14
+	},
+	"hat_18": {
+		"sx": 0,
+		"sy": 215,
+		"width": 18,
+		"height": 11
+	},
+	"hat_19": {
+		"sx": 0,
+		"sy": 227,
+		"width": 21,
 		"height": 11
 	}
 }
