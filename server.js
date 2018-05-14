@@ -70,7 +70,6 @@ var unique_hat_id_counter = 0;
 let remaining_count = HAT_COUNT;
 for(let i = 0; i < HAT_TYPES-1; i++){
     let slice_count = Math.floor(Math.random() * (remaining_count - (HAT_TYPES - i - 1))) + 1;
-    console.log("slice: " + slice_count);
     for(let j = 0; j < slice_count; j++){
         //Choose location
         let width = 16;
@@ -81,11 +80,11 @@ for(let i = 0; i < HAT_TYPES-1; i++){
         let temp_hy = Math.floor(temp_y/CELL_SIZE);
 
         //Generate object
-        if(hat_hash[[temp_hx,temp_hy] == undefined]){
+        if(hat_hash[[temp_hx,temp_hy]] == undefined){
             hat_hash[[temp_hx,temp_hy]] = [];
         }
         hat_hash[[temp_hx,temp_hy]].push(unique_hat_id_counter);
-        hat_data["data"].push([temp_x, temp_y, width, height]);
+        hat_data["data"].push([temp_x, temp_y, width, height, i]);
         unique_hat_id_counter++;
     }
     remaining_count = remaining_count - slice_count;
@@ -100,11 +99,11 @@ for(let i = 0; i < remaining_count; i++){
     let temp_hy = Math.floor(temp_y/CELL_SIZE);
 
     //Generate object
-    if(hat_hash[[temp_hx,temp_hy] == undefined]){
+    if(hat_hash[[temp_hx,temp_hy]] == undefined){
         hat_hash[[temp_hx,temp_hy]] = [];
     }
     hat_hash[[temp_hx,temp_hy]].push(unique_hat_id_counter);
-    hat_data["data"].push([temp_x, temp_y, width, height]);
+    hat_data["data"].push([temp_x, temp_y, width, height, HAT_TYPES-1]);
     unique_hat_id_counter++;
 }
 
@@ -117,7 +116,7 @@ setInterval(function() {
 	};
 	for (let client of wss.clients) {
 		data["data"][client.unique_id] = {
-			x_position: client.x_position,
+		  x_position: client.x_position,
 		  y_position: client.y_position,
           collected: []
 		};
@@ -137,6 +136,7 @@ setInterval(function() {
             let hat_bot = hat_top + hat_pos[3];
             if(player_top < hat_bot && player_right > hat_left &&
                player_bot > hat_top && player_left > hat_right){
+                delete hat_hash[[hx_position,hy_position]][i];
                 data["data"][client.unique_id]["collected"].push(hat_id); 
             }
         }
@@ -153,8 +153,8 @@ wss.on('connection', (client) => {
 	console.log('Dab for the new connection \n');
 
 	client.unique_id = unique_counter;
-	client.x_position = 63000;
-	client.y_position = 63000;
+	client.x_position = 32000;
+	client.y_position = 32000;
 	client.width = 0;
 	client.height = 0;
 	var player_data = {
@@ -162,6 +162,9 @@ wss.on('connection', (client) => {
 		data: {player_id: unique_counter}
 	};
 	client.send(JSON.stringify(player_data));
+
+    // Hat_data defined earlier
+    client.send(JSON.stringify(hat_data));
 
 	unique_counter++;
 
@@ -184,10 +187,10 @@ wss.on('connection', (client) => {
 	      }
 				if (client.x_position < 0) client.x_position = 0;
 				if (client.x_position+client.width > WORLD_SIZE*WORLD_UNIT)
-					client.x_position = WORLD_SIZE*WORLD_UNIT - client.width - 1;
+					client.x_position = WORLD_SIZE*WORLD_UNIT - client.width;
 				if (client.y_position < 0) client.y_position = 0;
 				if (client.y_position+client.height > WORLD_SIZE*WORLD_UNIT)
-					client.y_position = WORLD_SIZE*WORLD_UNIT - client.height - 1;
+					client.y_position = WORLD_SIZE*WORLD_UNIT - client.height;
 	  }
 		else if (message.type == "player info") {
 			client.width = message.data.width;
@@ -225,7 +228,3 @@ wss.broadcast = function broadcast(data) {
 server.listen(port, () => {
 	console.log('The magic happens on port ' + port);
 });
-
-exports.closeServer = function(){
-  server.close();
-};
