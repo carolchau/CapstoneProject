@@ -1,5 +1,5 @@
 import {GameManager, AssetManager} from './graphics/managers.js';
-import {Player} from './graphics/objects.js';
+import {StaticObject, Player} from './graphics/objects.js';
 
 document.addEventListener("DOMContentLoaded", function(event) {
 		let canvas = document.getElementById('game');
@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 	  let player = new Player('player');
 		let manager = null;
+		let hat_data = [];
 
 	  // Make WebSocket connection
     let ws = new WebSocket('ws://' + window.location.hostname + ':' + window.location.port);
@@ -46,6 +47,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			manager = new GameManager(ctx, names_ctx, gui_ctx, canvas.width,
 																canvas.height, player);
 			manager.gen_around_player();
+			let num_of_hats = hat_data.length;
+			for (let i = 0; i < num_of_hats; i++) {
+				let hat = new StaticObject('hat_'+i);
+				hat.load_sprite(spritesheet[0], 76, 42, 13, 14);
+				manager.add_object(hat);
+			}
 			manager.start();
 		});
 
@@ -117,7 +124,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
             $('#chat-history').append($('<li>').text(message.data.player + ": " + chatmsg));
         } else if (message.type == "disconnect") {
             let player_to_drop = message.data.player;
-						console.log(player_to_drop)
             manager.drop_object('player_'+player_to_drop);
         }
 			  else if (message.type == "world_data") {
@@ -130,6 +136,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     if (id == player.id) {
                         player.x = message.data[int_id].x_position;
                         player.y = message.data[int_id].y_position;
+												let num_of_collected = message.data[int_id].collected.length;
+												for (let j = 0; j < num_of_collected; j++) {
+													let hat_id = message.data[int_id].collected[j];
+													player.inventory.push(manager._objects['hat_'+hat_id].type);
+													manager.drop_object('hat_'+hat_id);
+												}
                     } else {
                         if (manager._objects[id] == null) {
                             let new_player = new Player(id);
@@ -148,12 +160,20 @@ document.addEventListener("DOMContentLoaded", function(event) {
                             manager._objects[id].x = message.data[int_id].x_position;
                             manager._objects[id].y = message.data[int_id].y_position;
                         }
+												let num_of_collected = message.data[int_id].collected.length;
+												for (let j = 0; j < num_of_collected; j++) {
+													let hat_id = message.data[int_id].collected[j];
+													manager.drop_object('hat_'+hat_id);
+												}
                     }
                 }
             }
         } else if (message.type == "id") {
             player.id = 'player_' + message.data.player_id;
         }
+				else if (message.type == 'hat_data') {
+					hat_data = message.data;
+				}
     };
 
     // Close WebSocket connection before window resources + documents are unloaded
