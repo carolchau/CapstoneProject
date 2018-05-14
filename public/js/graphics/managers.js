@@ -46,7 +46,9 @@ export class GameManager {
 		let object_keys = Object.keys(this._objects);
 		let num_of_chunks = object_keys.length;
 		for (let i = 0; i < num_of_chunks; i++) {
-			this._objects[object_keys[i]].update();
+			if (this._objects[object_keys[i]].type == 'player') {
+				this._objects[object_keys[i]].update();
+			}
 		}
 	}
 
@@ -130,7 +132,9 @@ export class GameManager {
 																	 obj.y - 10 - this.viewrect_y);
 				}
 			}
-			this._objects[object_keys[i]].postdraw();
+			if (obj.type == 'player') {
+				this._objects[object_keys[i]].postdraw();
+			}
 		}
 
 		// draw player

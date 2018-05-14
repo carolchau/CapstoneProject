@@ -13,8 +13,8 @@ class GameObject {
 	}
 
 	// Getters and setters
-	get id () { return this._id; }
-	set id (id) {this._id = id; }
+	get id () {return this._id;}
+	set id (id) {this._id = id;}
 	get x () {return this._x;}
 	set x (x) {this._x = x;}
 	get y () {return this._y;}
@@ -39,7 +39,7 @@ export class StaticObject extends GameObject {
 		this._sprites['idle'] = [];
 		this._sprites['idle'][0] = cached_assets[img_name];
 		this._sx = sx || 0;
-		this._xy = sy || 0;
+		this._sy = sy || 0;
 		this._width = sw || cached_assets[img_name].width;
 		this._height = sh || cached_assets[img_name].height;
 		return true;
@@ -155,9 +155,11 @@ export class Player extends AnimatedObject {
 		super(id);
 		this._idle = true;
 		this._type = 'player';
+		this._inventory = [];
 	}
 
 	get type () { return this._type; }
+	get inventory () { return this._inventory; }
 
 	// play different animations depending on movement direction
 	update () {
