@@ -154,7 +154,8 @@ export class GameManager {
 	// Start main game loop after setting active player position to idle
 	start () {
 		this.player.play_anim('idle_s');
-		this.main_loop();
+		this.gen_around_player();
+		setTimeout(()=>requestAnimationFrame(this.main_loop.bind(this)), 1000);
 	}
 
 	// Generate world chunks around player
@@ -236,15 +237,15 @@ class WorldChunk {
 		this._y_bot = y_top + CHUNK_SIZE;
 	}
 
-	// fill the tile from 16x16 biome blocks on the offscreen canvas (prerender)\
+	// fill the tile from 16x16 biome blocks on the offscreen canvas (prerender)
 	// x_left (int): position of left boundary of tile
 	// y_top (int): position of upper boundary of tile
 	gen (id) {
 		let img = new Image();
-		img.ctx = this._ctx;
+		var _this = this;
 		img.onload = () => {
-			this._ctx.drawImage(img, 0, 0);
-		}
+			_this._ctx.drawImage(img, 0, 0);
+		};
 		img.src = window.location.origin + '/img/chunks/' + id + '.jpg';
 	}
 
