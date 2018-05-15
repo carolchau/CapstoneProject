@@ -4,7 +4,7 @@ import {Player} from './graphics/objects.js';
 document.addEventListener("DOMContentLoaded", function(event) {
 		
 	  // Make WebSocket connection
-        let ws = new WebSocket('wss://' + window.location.hostname + ':' + window.location.port);
+        let ws = new WebSocket(location.origin.replace(/^http/, 'ws'));
         ws.onopen = () => { console.log("Connected to server!"); }
         let canvas = document.getElementById('game');
 		let names_canvas = document.getElementById('names');
