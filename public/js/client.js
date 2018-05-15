@@ -51,12 +51,14 @@ document.addEventListener("DOMContentLoaded", function(event) {
 				manager.gen_around_player();
 				let num_of_hats = hat_data.length;
 				for (let i = 0; i < num_of_hats; i++) {
-					let hat = new StaticObject('hat_'+i);
-					hat.load_sprite(spritesheet[0], hat_data[i][4], hat_data[i][5], hat_data[i][2], hat_data[i][3]);
-					hat.x = hat_data[i][0];
-					hat.y = hat_data[i][1];
-					hat.type = hat_data[i][6];
-					manager.add_static_object(hat);
+                    if(hat_data[i] != undefined){
+                        let hat = new StaticObject('hat_'+i);
+                        hat.load_sprite(spritesheet[0], hat_data[i][4], hat_data[i][5], hat_data[i][2], hat_data[i][3]);
+                        hat.x = hat_data[i][0];
+                        hat.y = hat_data[i][1];
+                        hat.type = hat_data[i][6];
+                        manager.add_static_object(hat);
+                    }
 				}
 				manager.start();
 			});

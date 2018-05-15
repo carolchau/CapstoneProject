@@ -144,7 +144,7 @@ setInterval(function() {
 							if(player_top < hat_bot && player_right > hat_left &&
 								 player_bot > hat_top && player_left < hat_right){
 									hat_hash[[hx_position,hy_position]].splice(i,1);
-                                    hat_data["data"].splice(i,1);
+                                    delete hat_data["data"][hat_id];
 									data["data"][client.unique_id]["collected"].push(hat_id);
 							}
 					}
