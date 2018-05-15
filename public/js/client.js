@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 				hat.x = hat_data[i][0];
 				hat.y = hat_data[i][1];
 				hat.type = hat_data[i][6];
-				manager.add_object(hat);
+				manager.add_static_object(hat);
 			}
 			manager.start();
 		});
@@ -127,7 +127,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
             $('#chat-history').append($('<li>').text(message.data.player + ": " + chatmsg));
         } else if (message.type == "disconnect") {
             let player_to_drop = message.data.player;
-            manager.drop_object('player_'+player_to_drop);
+            manager.drop_moving_object('player_'+player_to_drop);
         }
 			  else if (message.type == "world_data") {
             if (manager != null) {
@@ -142,11 +142,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
 												let num_of_collected = message.data[int_id].collected.length;
 												for (let j = 0; j < num_of_collected; j++) {
 													let hat_id = message.data[int_id].collected[j];
-													player.inventory.push(manager._objects['hat_'+hat_id].type);
-													manager.drop_object('hat_'+hat_id);
+													player.inventory.push(manager._static_objects['hat_'+hat_id]);
+													manager.drop_static_object('hat_'+hat_id);
 												}
                     } else {
-                        if (manager._objects[id] == null) {
+                        if (manager._moving_objects[id] == null) {
                             let new_player = new Player(id);
 														new_player.load_animation('idle_n', spritesheet, [[0,0]], 14, 21, 0);
 														new_player.load_animation('idle_s', spritesheet, [[14,0]], 14, 21, 0);
@@ -158,15 +158,15 @@ document.addEventListener("DOMContentLoaded", function(event) {
 														new_player.load_animation('walk_e', spritesheet, [[84,21],[98,21]], 14, 21, 1);
                             new_player.x = message.data[int_id].x_position;
                             new_player.y = message.data[int_id].y_position;
-                            manager.add_object(new_player);
+                            manager.add_moving_object(new_player);
                         } else {
-                            manager._objects[id].x = message.data[int_id].x_position;
-                            manager._objects[id].y = message.data[int_id].y_position;
+                            manager._moving_objects[id].x = message.data[int_id].x_position;
+                            manager._moving_objects[id].y = message.data[int_id].y_position;
                         }
 												let num_of_collected = message.data[int_id].collected.length;
 												for (let j = 0; j < num_of_collected; j++) {
 													let hat_id = message.data[int_id].collected[j];
-													manager.drop_object('hat_'+hat_id);
+													manager.drop_static_object('hat_'+hat_id);
 												}
                     }
                 }
