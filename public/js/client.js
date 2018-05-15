@@ -2,7 +2,11 @@ import {GameManager, AssetManager} from './graphics/managers.js';
 import {Player} from './graphics/objects.js';
 
 document.addEventListener("DOMContentLoaded", function(event) {
-		let canvas = document.getElementById('game');
+		
+	  // Make WebSocket connection
+        let ws = new WebSocket('wss://' + window.location.hostname + ':' + window.location.port);
+        ws.onopen = () => { console.log("Connected to server!"); }
+        let canvas = document.getElementById('game');
 		let names_canvas = document.getElementById('names');
 		let gui_canvas = document.getElementById('gui');
 		canvas.width = window.innerWidth, canvas.height = window.innerHeight - $('#chat-history').height();
@@ -17,9 +21,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	  let player = new Player('player');
 		let manager = null;
 
-	  // Make WebSocket connection
-    let ws = new WebSocket('wss://' + window.location.hostname + ':' + window.location.port);
-    ws.onopen = () => { console.log("Connected to server!"); }
 
 		let asset_manager = new AssetManager();
 		let img_list = [];
