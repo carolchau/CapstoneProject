@@ -1,6 +1,7 @@
 import {GameManager, AssetManager} from './graphics/managers.js';
 import {StaticObject, Player} from './graphics/objects.js';
 import {cached_assets} from './graphics/constants.js';
+import {GUIInventory} from './graphics/inventory.js';
 
 document.addEventListener("DOMContentLoaded", function(event) {
 		let canvas = document.getElementById('game');
@@ -50,16 +51,23 @@ document.addEventListener("DOMContentLoaded", function(event) {
 																canvas.height, player);
 			manager.gen_around_player();
 			let num_of_hats = hat_data.length;
+			let hat_type = 0;
 			for (let i = 0; i < num_of_hats; i++) {
-				let hat = new StaticObject('hat_'+i);
-				hat.load_sprite(spritesheet[0], hat_data[i][4], hat_data[i][5], hat_data[i][2], hat_data[i][3]);
-				hat.x = hat_data[i][0];
-				hat.y = hat_data[i][1];
-				hat.type = hat_data[i][6];
-				manager.add_object(hat);
+				if (hat_data[i][6] == hat_type) {
+					let hat = new StaticObject('hat_'+i);
+					hat.load_sprite(spritesheet[0], hat_data[i][4], hat_data[i][5], hat_data[i][2], hat_data[i][3]);
+					hat.x = 32000 + 20*hat_type;
+					hat.y = 32000 + 20*hat_type;
+					hat.type = hat_data[i][6];
+					manager.add_object(hat);
+					// player.inventory.push(hat);
+					hat_type++;
+				}
 			}
 			manager.start();
 		});
+
+
 
 
 		// click on chat history to hide/unhide
@@ -116,7 +124,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		$(document).keydown(function(e) {
 			if (e.keyCode === 73) {
 				if (!toggle) {
-					gui_ctx.drawImage(cached_assets[inventory_img], 0, 0, 160, 128, 100, 100, 160, 128);
+					let inventory = new GUIInventory(gui_ctx, player, inventory_img, spritesheet);
+					inventory.draw();
 					toggle = !toggle;
 				} else {
 					gui_ctx.clearRect(0, 0, gui_canvas.width, gui_canvas.height);
@@ -157,7 +166,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 												let num_of_collected = message.data[int_id].collected.length;
 												for (let j = 0; j < num_of_collected; j++) {
 													let hat_id = message.data[int_id].collected[j];
-													player.inventory.push(manager._objects['hat_'+hat_id].type);
+													player.inventory.push(manager._objects['hat_'+hat_id]);
 													manager.drop_object('hat_'+hat_id);
 												}
                     } else {
