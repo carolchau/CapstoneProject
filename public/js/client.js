@@ -18,6 +18,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	  let player = new Player('player');
 		let manager = null;
 		let hat_data = [];
+		let spritesheet = ['img/sheet.png'];
 
 	  // Make WebSocket connection
     let ws = new WebSocket(location.origin.replace(/^http/, 'ws'));
@@ -25,7 +26,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			console.log("Connected to server!");
 
 			let asset_manager = new AssetManager();
-			let spritesheet = ['img/sheet.png'];
 			let img_list = [spritesheet];
             
 			asset_manager.load_images(img_list, () => {
