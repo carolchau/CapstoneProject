@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		let manager = null;
 
 	  // Make WebSocket connection
-    let ws = new WebSocket('ws://' + window.location.hostname + ':' + window.location.port);
+    let ws = new WebSocket('wss://' + window.location.hostname + ':' + window.location.port);
     ws.onopen = () => { console.log("Connected to server!"); }
 
 		let asset_manager = new AssetManager();
