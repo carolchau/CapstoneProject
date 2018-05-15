@@ -50,7 +50,7 @@ export class StaticObject extends GameObject {
 		// offset position by viewrect, so drawn relative to viewrect
 		ctx.drawImage(this._sprites['idle'][0], this._sx, this._sy, this._width,
 			            this._height, this._x - ctx_left, this._y - ctx_top,
-									this._width, this._height);
+			this._width, this._height);
 	}
 }
 
@@ -156,8 +156,11 @@ export class Player extends AnimatedObject {
 		this._idle = true;
 		this._type = 'player';
 		this._inventory = [];
+		this._hat = null;
 	}
 
+	set hat (hat) { this._hat = hat; }
+	get hat () { return this._hat; }
 	get type () { return this._type; }
 	get inventory () { return this._inventory; }
 
@@ -217,6 +220,15 @@ export class Player extends AnimatedObject {
 				anim_name != 'walk_n' && anim_name != 'walk_s' &&
 				anim_name != 'walk_w' && anim_name != 'walk_e') return;
 		super.load_animation(anim_name, img_names, pos_list, sw, sh, animation_length);
+	}
+
+	draw (ctx, ctx_left, ctx_top) {
+		super.draw(ctx, ctx_left, ctx_top);
+		if (this._hat) {
+			this._hat.x = this._x;
+			this._hat.y = this._y;
+			this._hat.draw(ctx, ctx_left, ctx_top);
+		}
 	}
 }
 

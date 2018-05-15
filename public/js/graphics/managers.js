@@ -46,7 +46,7 @@ export class GameManager {
 		}
 		this._objects_hash[[hx,hy]].push(obj.id);
 	}
-  drop_static_object (id) {
+	drop_static_object (id) {
 		let hx = Math.floor(this._static_objects[id].x/CHUNK_SIZE);
 		let hy = Math.floor(this._static_objects[id].y/CHUNK_SIZE);
 		let bucket = this._objects_hash[[hx,hy]];
@@ -82,13 +82,13 @@ export class GameManager {
 		// clearing and refilling background
 		let object_keys = Object.keys(this._moving_objects);
 		let num_of_objects = object_keys.length;
-		let filled_chunks = {}
+		let filled_chunks = {};
 		// this can be redrawn selectively only if active player doesn't move,
 		// otherwise the background and all visible objects need to be shifted
 		if (!this.player.moved) {
 			for (let i = 0; i < num_of_objects; i++) {
 				let obj = this._moving_objects[object_keys[i]];
-				let x_left = obj.last_x, x_right = obj.last_x + obj.width
+				let x_left = obj.last_x, x_right = obj.last_x + obj.width;
 				let y_top = obj.last_y, y_bot = obj.last_y + obj.height;
 				let clear_x = x_left - this.viewrect_x, clear_y = y_top - this.viewrect_y;
 				// check if each animated object moved and is visible
@@ -103,8 +103,8 @@ export class GameManager {
 							chunk_x = (chunk_x < 0) ? 0 : chunk_x;
 							chunk_y = (chunk_y < 0) ? 0 : chunk_y;
 							this._ctx.drawImage(this._chunks[chunk_id]._can, chunk_x, chunk_y,
-																	obj.width, obj.height, clear_x, clear_y,
-																	obj.width, obj.height);
+								obj.width, obj.height, clear_x, clear_y,
+								obj.width, obj.height);
 							// set the world chunk to filled, so it does not need to be redrawn
 							filled_chunks[chunk_id] = true;
 						}
@@ -121,7 +121,7 @@ export class GameManager {
 			for (let j = 0; j < y_range; j++) {
 				let chunk_id_x = x_left_chunk + i, chunk_id_y = y_top_chunk + j;
 				if (chunk_id_x >= 0 && chunk_id_x < WORLD_SIZE*WORLD_UNIT/CHUNK_SIZE &&
-					  chunk_id_y >= 0 && chunk_id_y < WORLD_SIZE*WORLD_UNIT/CHUNK_SIZE) {
+					chunk_id_y >= 0 && chunk_id_y < WORLD_SIZE*WORLD_UNIT/CHUNK_SIZE) {
 					let chunk_id = chunk_id_x + ',' + chunk_id_y;
 					if (this.player.stopped_moving || (!filled_chunks[chunk_id] && this.player.moved)) {
 						this._chunks[chunk_id].draw(this._ctx, this.viewrect_x, this.viewrect_y);
@@ -225,7 +225,7 @@ export class AssetManager {
 		let onload_image = () => {
 			batch.count++;
 			if (batch.count == batch.total) batch.callback();
-		}
+		};
 		for (let i = 0; i < num_of_images; i++) {
 			let name = img_list[i];
 			if (cached_assets[name] == null) {
