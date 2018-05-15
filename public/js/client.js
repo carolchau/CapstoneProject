@@ -51,24 +51,16 @@ document.addEventListener("DOMContentLoaded", function(event) {
 																canvas.height, player);
 			manager.gen_around_player();
 			let num_of_hats = hat_data.length;
-			let hat_type = 0;
 			for (let i = 0; i < num_of_hats; i++) {
-				if (hat_data[i][6] == hat_type) {
-					let hat = new StaticObject('hat_'+i);
-					hat.load_sprite(spritesheet[0], hat_data[i][4], hat_data[i][5], hat_data[i][2], hat_data[i][3]);
-					hat.x = 32000 + 20*hat_type;
-					hat.y = 32000 + 20*hat_type;
-					hat.type = hat_data[i][6];
-					manager.add_object(hat);
-					// player.inventory.push(hat);
-					hat_type++;
-				}
+				let hat = new StaticObject('hat_'+i);
+				hat.load_sprite(spritesheet[0], hat_data[i][4], hat_data[i][5], hat_data[i][2], hat_data[i][3]);
+				hat.x = hat_data[i][0];
+				hat.y = hat_data[i][1];
+				hat.type = hat_data[i][6];
+				manager.add_object(hat);
 			}
 			manager.start();
 		});
-
-
-
 
 		// click on chat history to hide/unhide
     let chat_hidden = true;
@@ -120,16 +112,51 @@ document.addEventListener("DOMContentLoaded", function(event) {
     });
 
 		// Player display Inventory (i)
-		let toggle = false;
+		let isInventoryOn = false;
 		$(document).keydown(function(e) {
 			if (e.keyCode === 73) {
-				if (!toggle) {
+				if (!isInventoryOn) {
 					let inventory = new GUIInventory(gui_ctx, player, inventory_img, spritesheet);
 					inventory.draw();
-					toggle = !toggle;
+					isInventoryOn = !isInventoryOn;
 				} else {
 					gui_ctx.clearRect(0, 0, gui_canvas.width, gui_canvas.height);
-					toggle = !toggle;
+					isInventoryOn = !isInventoryOn;
+				}
+			}
+		});
+
+		gui_canvas.addEventListener('click', (e) => {
+			let x = e.clientX - gui_canvas.offsetLeft;
+			let y = e.clientY - gui_canvas.offsetTop;
+
+			let offset_x = 100;
+			let offset_y = 100;
+
+			if (isInventoryOn) {
+				if (offset_x <= x && x < offset_x + (32*5)) {
+					let grid_num = -1;
+
+					// Figure out which grid
+					if (offset_y <= y && y < offset_y + (32*1)) {
+						grid_num = Math.floor((x - offset_x)/32);
+					}	else if (offset_y + (32*1) <= y && y < offset_y + (32*2)) {
+						grid_num = Math.floor((x - offset_x)/32) + (5 * 1);
+					}	else if (offset_y + (32*2) <= y && y < offset_y + (32*3)) {
+						grid_num = Math.floor((x - offset_x)/32) + (5 * 2);
+					}	else if (offset_y + (32*3) <= y && y < offset_y + (32*4)) {
+						grid_num = Math.floor((x - offset_x)/32) + (5 * 3);
+					}
+
+					// Draw hat if hat is in inventory
+					let inventory_length = player.inventory.length;
+					for (let i = 0; i < inventory_length; ++i) {
+						if (player.inventory[i].type === grid_num) {
+							player.hat = player.inventory[i];
+							break;
+						}
+					}
+
 				}
 			}
 		});
@@ -166,7 +193,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 												let num_of_collected = message.data[int_id].collected.length;
 												for (let j = 0; j < num_of_collected; j++) {
 													let hat_id = message.data[int_id].collected[j];
-													player.inventory.push(manager._objects['hat_'+hat_id]);
+													let hat = manager._objects['hat_'+hat_id];
+													player.inventory.push(hat);
 													manager.drop_object('hat_'+hat_id);
 												}
                     } else {
