@@ -3,9 +3,6 @@ import {Player} from './graphics/objects.js';
 
 document.addEventListener("DOMContentLoaded", function(event) {
 		
-	  // Make WebSocket connection
-        let ws = new WebSocket(location.origin.replace(/^http/, 'ws'));
-        ws.onopen = () => { console.log("Connected to server!"); }
         let canvas = document.getElementById('game');
 		let names_canvas = document.getElementById('names');
 		let gui_canvas = document.getElementById('gui');
@@ -35,30 +32,34 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		img_list = img_list.concat(player_stand_n, player_stand_s, player_stand_w,
 															 player_stand_e, player_walk_n, player_walk_s,
 															 player_walk_w, player_walk_e);
+        
+	    // Make WebSocket connection
+        let ws = new WebSocket(location.origin.replace(/^http/, 'ws'));
+        ws.onopen = () => { console.log("Connected to server!");
+            asset_manager.load_images(img_list, () => {
+                player.load_animation('idle_n', player_stand_n, 0);
+                player.load_animation('idle_s', player_stand_s, 0);
+                player.load_animation('idle_w', player_stand_w, 0);
+                player.load_animation('idle_e', player_stand_e, 0);
+                player.load_animation('walk_n', player_walk_n, 1);
+                player.load_animation('walk_s', player_walk_s, 1);
+                player.load_animation('walk_w', player_walk_w, 1);
+                player.load_animation('walk_e', player_walk_e, 1);
+                player.x = 32000;
+                player.y = 32000;
+                let data = {
+                    type: "player info",
+                    data: {width: player.width,
+                                 height: player.height}
+                };
+                ws.send(JSON.stringify(data));
 
-		asset_manager.load_images(img_list, () => {
-			player.load_animation('idle_n', player_stand_n, 0);
-			player.load_animation('idle_s', player_stand_s, 0);
-			player.load_animation('idle_w', player_stand_w, 0);
-			player.load_animation('idle_e', player_stand_e, 0);
-			player.load_animation('walk_n', player_walk_n, 1);
-			player.load_animation('walk_s', player_walk_s, 1);
-			player.load_animation('walk_w', player_walk_w, 1);
-			player.load_animation('walk_e', player_walk_e, 1);
-			player.x = 32000;
-			player.y = 32000;
-			let data = {
-				type: "player info",
-				data: {width: player.width,
-							 height: player.height}
-			};
-			ws.send(JSON.stringify(data));
-
-			manager = new GameManager(ctx, names_ctx, gui_ctx, canvas.width,
-																canvas.height, player);
-			manager.gen_around_player();
-			manager.start();
-		});
+                manager = new GameManager(ctx, names_ctx, gui_ctx, canvas.width,
+                                                                    canvas.height, player);
+                manager.gen_around_player();
+                manager.start();
+            });
+        }
 
 
 		// click on chat history to hide/unhide
