@@ -50,7 +50,7 @@ export class StaticObject extends GameObject {
 		// offset position by viewrect, so drawn relative to viewrect
 		ctx.drawImage(this._sprites['idle'][0], this._sx, this._sy, this._width,
 			            this._height, this._x - ctx_left, this._y - ctx_top,
-									this._width, this._height);
+			this._width, this._height);
 	}
 }
 
