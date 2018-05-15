@@ -1,5 +1,6 @@
 import {GameManager, AssetManager} from './graphics/managers.js';
 import {StaticObject, Player} from './graphics/objects.js';
+import {cached_assets} from './graphics/constants.js';
 
 document.addEventListener("DOMContentLoaded", function(event) {
 		let canvas = document.getElementById('game');
@@ -24,7 +25,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 		let asset_manager = new AssetManager();
 		let spritesheet = ['img/sheet.png'];
-		let img_list = [spritesheet];
+		let inventory_img = 'img/Inventory.png';
+		let img_list = [spritesheet, inventory_img];
 
 		asset_manager.load_images(img_list, () => {
 			player.load_animation('idle_n', spritesheet, [[0,0]], 14, 21, 0);
@@ -109,6 +111,19 @@ document.addEventListener("DOMContentLoaded", function(event) {
         }
     });
 
+		// Player display Inventory (i)
+		let toggle = false;
+		$(document).keydown(function(e) {
+			if (e.keyCode === 73) {
+				if (!toggle) {
+					gui_ctx.drawImage(cached_assets[inventory_img], 0, 0, 160, 128, 100, 100, 160, 128);
+					toggle = !toggle;
+				} else {
+					gui_ctx.clearRect(0, 0, gui_canvas.width, gui_canvas.height);
+					toggle = !toggle;
+				}
+			}
+		});
 
     // Handle message passed from server
     ws.onmessage = (msg) => {
