@@ -9,8 +9,7 @@ canvas {
 }
 </style>
 </head>
-<body onload="startGame()">
-    
+<body onload="startGame()"> 
     
 <script>
 
@@ -20,34 +19,67 @@ var Obstacle =[];
 var Hat = [];
 
 //Image variables   
-var Plimg = new Image(); 
-var rock  = new Image();
-var lamp  = new Image();
-var tree = new Image();
-var home  = new Image();     
-Plimg.src = 'player.png';    
-rock.src  = 'rock.png';
-lamp.src  = 'lamp.png';
-tree.src = 'long tree.png';
-home.src  = 'home.png';
-
+var Plimg = new Image();     
+Plimg.src = 'player.png';     
+var thing  = new Image();
+thing.src = "object sheet.png";
+    
 //This is where the variables are placed on the map
 function startGame() {
     GameArea.start();
-    Player      = new component(Plimg, 10, 120);
-    Obstacle[0] = new component(rock, 120, 120);
-    Obstacle[1] = new component(tree, 160, 120);
-    Obstacle[2] = new component(lamp, 200, 120);
-    Obstacle[3] = new component(home, 240, 120);
-    Hat[0]      = new component(rock,120,60);
-}
-
+    Player      = new component(Plimg, Plimg, 210, 110);
+    Obstacle[0] = new component(thing, "rock1", 20, 20);
+    Obstacle[1] = new component(thing, "rock2", 40, 20);
+    Obstacle[2] = new component(thing, "rock3", 60, 20);
+    Obstacle[3] = new component(thing, "rock4", 80, 20);
+    Obstacle[4] = new component(thing, "rock5", 100, 20);
+    Obstacle[5] = new component(thing, "rock6", 140, 20);
+    Obstacle[6] = new component(thing, "rock7", 180, 20);
     
+    Obstacle[7] = new component(thing, "pot1", 20, 60);
+    Obstacle[8] = new component(thing, "pot2", 40, 60);
+    Obstacle[9] = new component(thing, "pot3", 60, 60);
+    Obstacle[10] = new component(thing, "pot4", 80, 60);
+    
+    Obstacle[11] = new component(thing, "tree1", 20, 120);
+    Obstacle[12] = new component(thing, "tree2", 40, 120);
+    Obstacle[13] = new component(thing, "tree3", 80, 120);
+    
+    Obstacle[14] = new component(thing, "build1", 20, 200);
+    Obstacle[15] = new component(thing, "build2", 90, 200);
+    Obstacle[16] = new component(thing, "build3", 160, 200);
+    Obstacle[17] = new component(thing, "build4", 220, 200);
+    Obstacle[18] = new component(thing, "build5", 270, 200);
+    Obstacle[19] = new component(thing, "build6", 360, 200);
+    
+    Obstacle[20] = new component(thing, "lamp", 110, 127);
+    
+    Hat[0] = new component(thing, "hat1", 240, 20);
+    Hat[1] = new component(thing, "hat2", 260, 20);
+    Hat[2] = new component(thing, "hat3", 280, 20);
+    Hat[3] = new component(thing, "hat4", 300, 20);
+    Hat[4] = new component(thing, "hat5", 320, 20);
+    Hat[5] = new component(thing, "hat6", 340, 20);
+    Hat[6] = new component(thing, "hat7", 360, 20);
+    Hat[7] = new component(thing, "hat8", 380, 20);
+    Hat[8] = new component(thing, "hat9", 400, 20);
+    Hat[9] = new component(thing, "hat10", 240, 80);
+    Hat[10] = new component(thing, "hat11", 260, 80);
+    Hat[11] = new component(thing, "hat12", 280, 80);
+    Hat[12] = new component(thing, "hat13", 300, 80);
+    Hat[13] = new component(thing, "hat14", 320, 80);
+    Hat[14] = new component(thing, "hat15", 340, 80);
+    Hat[15] = new component(thing, "hat16", 360, 80);
+    Hat[16] = new component(thing, "hat17", 380, 80);
+    Hat[17] = new component(thing, "hat18", 400, 80);
+    Hat[18] = new component(thing, "hat19", 320, 50);  
+}
+  
 //Initializing the map
 var GameArea = {
     canvas : document.createElement("canvas"),
     start : function() {
-        this.canvas.width = 480;
+        this.canvas.width = 500;
         this.canvas.height = 270;
         this.context = this.canvas.getContext("2d");
         document.body.insertBefore(this.canvas, document.body.childNodes[0]);
@@ -66,44 +98,250 @@ var GameArea = {
 
 /*
 Function used for all collision variables
-takes in one of (currently three) image types (rock, tree,lamp & home), as well as the x & y coordinates
-in the case of tree,lamp & home the images will appear 16 pixels higher than the y coordinate. This is so the player does not collide with the very top
+takes in the source image, objest type , as well as the x & y coordinates
+in the case of talles images, they will appear higher than the y coordinate. This is so the player does not collide with the very top
+
+List of images on sprite sheet:
+hat(1-18)
+rock(1-7)
+pot(1-4)
+tree(1-3)
+build(1-6) //the buildings
+lamp
+
 */
-function component(img, x, y) {
+function component(src, img, x, y) {
     this.gamearea = GameArea;
     if(img == Plimg ){
         this.width = 16;
         this.height = 22;
-       }
-    else if(img == rock ){
-        this.width = 15;
+    }
+    else if(img == "rock1" ){
+        this.width = 14;
         this.height = 15;
-       }
-    else if(img == tree ){
+    }
+    else if(img == "rock2" ){
+        this.width = 12;
+        this.height = 11;
+    }
+    else if(img == "rock3" || img == "rock4" || img == "pot1" || img == "pot2" ){
+        this.width = 15;
+        this.height = 16;
+    }
+    else if(img == "rock5" ){
+        this.width = 28;
+        this.height = 31;
+    }
+    else if(img == "rock6" ){
+        this.width = 28;
+        this.height = 47;
+    }
+    else if(img == "rock7" ){
+        this.width = 44;
+        this.height = 47;
+    }
+    else if(img == "pot3" || img == "tree1" ){
+        this.width = 16;
+        this.height = 16;
+    }
+    else if(img == "pot4" || img == "hat12"){
         this.width = 16;
         this.height = 15;
-       }
-    else if(img == lamp ){
-        this.width = 11;
-        this.height = 14;
-       }
-    else if(img == home ){
+    }
+    else if(img == "tree2" ){
+        this.width = 32;
+        this.height = 16;
+    }
+    else if(img == "tree3" ){
+        this.width = 30;
+        this.height = 15;
+    }
+    else if(img == "build1" || img == "build2"|| img == "build3"|| img == "build4" ){
         this.width = 48;
-        this.height = 48;
-       }
-    
+        this.height = 39;
+    }
+    else if(img == "build5"){
+        this.width = 80;
+        this.height = 39;
+    }
+    else if(img == "build6"){
+        this.width = 96;
+        this.height = 39;
+    }
+    else if(img == "lamp"){
+        this.width = 11;
+        this.height = 8;
+    }
+    else if(img == "hat1"){
+        this.width = 11;
+        this.height = 9;
+    }
+    else if(img == "hat2"||img == "hat3"){
+        this.width = 13;
+        this.height = 11;
+    }
+    else if(img == "hat4"||img == "hat5"){
+        this.width = 15;
+        this.height = 11;
+    }
+    else if(img == "hat6"||img == "hat7"||img == "hat8"||img == "hat9"||img=="hat10"){
+        this.width = 15;
+        this.height = 12;
+    }
+    else if(img == "hat11"){
+        this.width = 15;
+        this.height = 14;
+    }
+    else if(img == "hat13"||img == "hat14"){
+        this.width = 17;
+        this.height = 11;
+    }
+    else if(img == "hat15"){
+        this.width = 17;
+        this.height = 12;
+    }
+    else if(img == "hat16"|| img == "hat17"){
+        this.width = 17;
+        this.height = 14;
+    }
+    else if(img == "hat18"){
+        this.width = 18;
+        this.height = 12;
+    }
+     else if(img == "hat19"){
+        this.width = 21;
+        this.height = 12;
+    }   
     this.speedX = 0;
     this.speedY = 0;    
     this.x = x;
     this.y = y;    
+    
     this.update = function() {
         ctx = GameArea.context;
-        if(img == tree || img == lamp || img == home ){
-            ctx.drawImage(img,this.x,this.y - 16);
-       }
-        else{
-        ctx.drawImage(img,this.x,this.y);
-        }  
+        if(img == Plimg ){
+            ctx.drawImage(src,this.x,this.y);
+        }
+        else if(img == "rock1"){
+            ctx.drawImage(src, 49,94,this.width,this.height,this.x,this.y,this.width,this.height);
+        }
+        else if(img == "rock2"){
+            ctx.drawImage(src, 58,16,this.width,this.height,this.x,this.y,this.width,this.height);
+        }
+        else if(img == "rock3"){
+            ctx.drawImage(src, 58,0,this.width,this.height,this.x,this.y,this.width,this.height);
+        }
+        else if(img == "rock4"){
+            ctx.drawImage(src, 34,94,this.width,this.height,this.x,this.y,this.width,this.height);
+        }
+         else if(img == "rock5"){
+            ctx.drawImage(src, 30,0,this.width,this.height,this.x,this.y,this.width,this.height);
+        }
+         else if(img == "rock6"){
+            ctx.drawImage(src, 75,0,this.width,this.height,this.x,this.y,this.width,this.height);
+        }
+           else if(img == "rock7"){
+            ctx.drawImage(src, 34,47,this.width,this.height,this.x,this.y,this.width,this.height);
+        }
+          else if(img == "pot1"){
+            ctx.drawImage(src, 21,117,this.width,this.height,this.x,this.y,this.width,this.height);
+        }
+          else if(img == "pot2"){
+            ctx.drawImage(src, 36,117,this.width,this.height,this.x,this.y,this.width,this.height);
+        }
+         else if(img == "pot3"){
+            ctx.drawImage(src, 51,117,this.width,this.height,this.x,this.y,this.width,this.height);
+        }
+         else if(img == "pot4"){
+            ctx.drawImage(src, 16,57,this.width,this.height,this.x,this.y,this.width,this.height);
+        }
+        else if(img == "tree1"){
+            ctx.drawImage(src, 149,0,this.width,31,this.x,this.y -15,this.width,31);
+        }
+        else if(img == "tree2"){
+            ctx.drawImage(src, 165,0,this.width,36,this.x,this.y -20,this.width,36);
+        }
+        else if(img == "tree3"){
+            ctx.drawImage(src, 197,0,this.width,32,this.x,this.y -16,this.width,32);
+        }
+        else if(img == "build1"){
+            ctx.drawImage(src, 78,47,this.width,63,this.x,this.y -24,this.width,63);
+        }
+        else if(img == "build2"){
+            ctx.drawImage(src, 126,55,this.width,55,this.x,this.y -16,this.width,55);
+        }
+        else if(img == "build3"){
+            ctx.drawImage(src, 174,46,this.width,64,this.x,this.y -25,this.width,64);
+        }
+         else if(img == "build4"){
+            ctx.drawImage(src, 176,132,this.width,64,this.x,this.y -25,this.width,64);
+        }
+         else if(img == "build5"){
+            ctx.drawImage(src, 96,133,this.width,64,this.x,this.y -25,this.width,64);
+        }
+         else if(img == "build6"){
+            ctx.drawImage(src, 0,133,this.width,64,this.x,this.y -25,this.width,64);
+        }
+         else if(img == "lamp"){
+            ctx.drawImage(src, 67,103,this.width,30,this.x,this.y -22,this.width,30);
+        }
+        else if(img == "hat1"){
+            ctx.drawImage(src, 0,0,this.width,this.height,this.x,this.y,this.width,this.height);
+        }
+        else if(img == "hat2"){
+            ctx.drawImage(src, 0,9,this.width,this.height,this.x,this.y,this.width,this.height);
+        }
+        else if(img == "hat3"){
+            ctx.drawImage(src, 13,9,this.width,this.height,this.x,this.y,this.width,this.height);
+        }
+         else if(img == "hat4"){
+            ctx.drawImage(src, 0,20,this.width,this.height,this.x,this.y,this.width,this.height);
+        }
+         else if(img == "hat5"){
+            ctx.drawImage(src, 15,20,this.width,this.height,this.x,this.y,this.width,this.height);
+        }
+          else if(img == "hat6"){
+            ctx.drawImage(src, 0,31,this.width,this.height,this.x,this.y,this.width,this.height);
+        }
+        else if(img == "hat7"){
+            ctx.drawImage(src, 15,31,this.width,this.height,this.x,this.y,this.width,this.height);
+        }
+        else if(img == "hat8"){
+            ctx.drawImage(src, 30,31,this.width,this.height,this.x,this.y,this.width,this.height);
+        }
+        else if(img == "hat9"){
+            ctx.drawImage(src, 45,31,this.width,this.height,this.x,this.y,this.width,this.height);
+        }
+        else if(img == "hat10"){
+            ctx.drawImage(src, 60,31,this.width,this.height,this.x,this.y,this.width,this.height);
+        }
+        else if(img == "hat11"){
+            ctx.drawImage(src, 0,43,this.width,this.height,this.x,this.y,this.width,this.height);
+        }
+        else if(img == "hat12"){
+            ctx.drawImage(src, 0,57,this.width,this.height,this.x,this.y,this.width,this.height);
+        }
+         else if(img == "hat13"){
+            ctx.drawImage(src, 0,72,this.width,this.height,this.x,this.y,this.width,this.height);
+        }
+          else if(img == "hat14"){
+            ctx.drawImage(src, 17,72,this.width,this.height,this.x,this.y,this.width,this.height);
+        }
+         else if(img == "hat15"){
+            ctx.drawImage(src, 0,83,this.width,this.height,this.x,this.y,this.width,this.height);
+        }
+         else if(img == "hat16"){
+            ctx.drawImage(src, 0,95,this.width,this.height,this.x,this.y,this.width,this.height);
+        }
+          else if(img == "hat17"){
+            ctx.drawImage(src, 17,95,this.width,this.height,this.x,this.y,this.width,this.height);
+        }
+            else if(img == "hat18"){
+            ctx.drawImage(src, 0,109,this.width,this.height,this.x,this.y,this.width,this.height);
+        }
+            else if(img == "hat19"){
+            ctx.drawImage(src, 0,121,this.width,this.height,this.x,this.y,this.width,this.height);
+        }
     }
     this.newPos = function() {
         this.x += this.speedX;
@@ -158,11 +396,11 @@ function updateGameArea() {
     if (GameArea.key && GameArea.key == 38 || GameArea.key && GameArea.key == 87) {Player.speedY = -3; }
     if (GameArea.key && GameArea.key == 40 || GameArea.key && GameArea.key == 83) {Player.speedY = 3; }
     Player.update();
-    for (i = 0; i < 4; i ++) {
+    for (i = 0; i < 21; i ++) {
         Player.crashWith(Obstacle[i]); 
         Obstacle[i].update();
     }
-    for (i = 0; i < 1; i ++) {
+    for (i = 0; i < 19; i ++) {
         if(Player.crashWith(Hat[i])){
            Hat[i].pickUp();
         } 
@@ -173,11 +411,8 @@ function updateGameArea() {
     Player.newPos();     
 }
       
-</script>
-    
-<p><strong>Note:</strong> The top rock is supposed to be a hat, I just don't have an image for one at the moment.</p>    
+</script>   
     
 </body>
-    
-    
+     
 </html>

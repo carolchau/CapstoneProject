@@ -28,25 +28,41 @@ export class GameManager {
 		this.viewrect_right = this.viewrect_x + this._can_width;
 		this.viewrect_bot = this.viewrect_y + this._can_height;
 
-		this._objects = {};
+		this._moving_objects = {};
+		this._static_objects = {};
+		this._objects_hash = {};
 		this._chunks = {};
-
-		this._initial_draw = true;
 	}
 
+	add_moving_object (obj) { this._moving_objects[obj.id] = obj; }
+	drop_moving_object (id) { delete this._moving_objects[id]; }
+
 	// Add or remove object from list of gameobjects
-	add_object (obj) { this._objects[obj.id] = obj; }
-  drop_object (id) { delete this._objects[id]; }
+	add_static_object (obj) {
+		this._static_objects[obj.id] = obj;
+		let hx = Math.floor(obj.x/CHUNK_SIZE), hy = Math.floor(obj.y/CHUNK_SIZE);
+		if (this._objects_hash[[hx,hy]] == undefined) {
+			this._objects_hash[[hx,hy]] = [];
+		}
+		this._objects_hash[[hx,hy]].push(obj.id);
+	}
+  drop_static_object (id) {
+		let hx = Math.floor(this._static_objects[id].x/CHUNK_SIZE);
+		let hy = Math.floor(this._static_objects[id].y/CHUNK_SIZE);
+		let bucket = this._objects_hash[[hx,hy]];
+		bucket.splice(bucket.indexOf(id), 1);
+		delete this._static_objects[id];
+	}
 
 	update () {
 		this.player.update();
 		this.gen_around_player();
 
-		// update all gameobjects
-		let object_keys = Object.keys(this._objects);
-		let num_of_chunks = object_keys.length;
-		for (let i = 0; i < num_of_chunks; i++) {
-			this._objects[object_keys[i]].update();
+		// update all animated gameobjects
+		let object_keys = Object.keys(this._moving_objects);
+		let num_of_objects = object_keys.length;
+		for (let i = 0; i < num_of_objects; i++) {
+			this._moving_objects[object_keys[i]].update();
 		}
 	}
 
@@ -64,14 +80,14 @@ export class GameManager {
 			this.viewrect_y = WORLD_SIZE*WORLD_UNIT - this._can_height;
 
 		// clearing and refilling background
-		let object_keys = Object.keys(this._objects);
+		let object_keys = Object.keys(this._moving_objects);
 		let num_of_objects = object_keys.length;
 		let filled_chunks = {}
 		// this can be redrawn selectively only if active player doesn't move,
 		// otherwise the background and all visible objects need to be shifted
 		if (!this.player.moved) {
 			for (let i = 0; i < num_of_objects; i++) {
-				let obj = this._objects[object_keys[i]];
+				let obj = this._moving_objects[object_keys[i]];
 				let x_left = obj.last_x, x_right = obj.last_x + obj.width
 				let y_top = obj.last_y, y_bot = obj.last_y + obj.height;
 				let clear_x = x_left - this.viewrect_x, clear_y = y_top - this.viewrect_y;
@@ -107,21 +123,27 @@ export class GameManager {
 				if (chunk_id_x >= 0 && chunk_id_x < WORLD_SIZE*WORLD_UNIT/CHUNK_SIZE &&
 					  chunk_id_y >= 0 && chunk_id_y < WORLD_SIZE*WORLD_UNIT/CHUNK_SIZE) {
 					let chunk_id = chunk_id_x + ',' + chunk_id_y;
-					if (this._initial_draw) {
+					if (this.player.stopped_moving || (!filled_chunks[chunk_id] && this.player.moved)) {
 						this._chunks[chunk_id].draw(this._ctx, this.viewrect_x, this.viewrect_y);
-						this._initial_draw = false;
 					}
-					else if (this.player.stopped_moving || (!filled_chunks[chunk_id] && this.player.moved)) {
-						this._chunks[chunk_id].draw(this._ctx, this.viewrect_x, this.viewrect_y);
+
+					// draw all static items in this chunk
+					let visible_static = this._objects_hash[[chunk_id_x,chunk_id_y]];
+					if (visible_static != undefined) {
+						let num_static = visible_static.length;
+						for (let i = 0; i < num_static; i++) {
+							let obj = this._static_objects[visible_static[i]];
+							obj.draw(this._ctx, this.viewrect_x, this.viewrect_y);
+						}
 					}
 				}
 			}
 		}
 
+		// moving object drawing
 		this._names_ctx.clearRect(0,0,this._can_width, this._can_height);
-		// object drawing
 		for (let i = 0; i < num_of_objects; i++) {
-			let obj = this._objects[object_keys[i]];
+			let obj = this._moving_objects[object_keys[i]];
 			if (obj.is_visible(this.viewrect_x, this.viewrect_right, this.viewrect_y,
 												 this.viewrect_bot)) {
 				obj.draw(this._ctx, this.viewrect_x, this.viewrect_y);
@@ -130,7 +152,9 @@ export class GameManager {
 																	 obj.y - 10 - this.viewrect_y);
 				}
 			}
-			this._objects[object_keys[i]].postdraw();
+			if (obj.type == 'player') {
+				this._moving_objects[object_keys[i]].postdraw();
+			}
 		}
 
 		// draw player
@@ -150,7 +174,8 @@ export class GameManager {
 	// Start main game loop after setting active player position to idle
 	start () {
 		this.player.play_anim('idle_s');
-		this.main_loop();
+		this.gen_around_player();
+		setTimeout(()=>requestAnimationFrame(this.main_loop.bind(this)), 1000);
 	}
 
 	// Generate world chunks around player
@@ -232,15 +257,15 @@ class WorldChunk {
 		this._y_bot = y_top + CHUNK_SIZE;
 	}
 
-	// fill the tile from 16x16 biome blocks on the offscreen canvas (prerender)\
+	// fill the tile from 16x16 biome blocks on the offscreen canvas (prerender)
 	// x_left (int): position of left boundary of tile
 	// y_top (int): position of upper boundary of tile
 	gen (id) {
 		let img = new Image();
-		img.ctx = this._ctx;
+		var _this = this;
 		img.onload = () => {
-			this._ctx.drawImage(img, 0, 0);
-		}
+			_this._ctx.drawImage(img, 0, 0);
+		};
 		img.src = window.location.origin + '/img/chunks/' + id + '.jpg';
 	}
 

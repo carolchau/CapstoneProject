@@ -1,0 +1,33 @@
+{
+	"count": 5,
+	"hat_0": {
+		"sx": 0,
+		"sy": 106,
+		"width": 11,
+		"height": 9
+	},
+	"hat_1": {
+		"sx": 0,
+		"sy": 115,
+		"width": 13,
+		"height": 11
+	},
+	"hat_2": {
+		"sx": 13,
+		"sy": 115,
+		"width": 13,
+		"height": 11
+	},
+	"hat_3": {
+		"sx": 0,
+		"sy": 126,
+		"width": 15,
+		"height": 11
+	},
+	"hat_4": {
+		"sx": 15,
+		"sy": 126,
+		"width": 15,
+		"height": 11
+	}
+}
