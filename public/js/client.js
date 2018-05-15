@@ -20,44 +20,46 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 	  // Make WebSocket connection
     let ws = new WebSocket('ws://' + window.location.hostname + ':' + window.location.port);
-    ws.onopen = () => { console.log("Connected to server!"); }
+    ws.onopen = () => {
+			console.log("Connected to server!");
 
-		let asset_manager = new AssetManager();
-		let spritesheet = ['img/sheet.png'];
-		let img_list = [spritesheet];
+			let asset_manager = new AssetManager();
+			let spritesheet = ['img/sheet.png'];
+			let img_list = [spritesheet];
 
-		asset_manager.load_images(img_list, () => {
-			player.load_animation('idle_n', spritesheet, [[0,0]], 14, 21, 0);
-			player.load_animation('idle_s', spritesheet, [[14,0]], 14, 21, 0);
-			player.load_animation('idle_w', spritesheet, [[28,0]], 14, 21, 0);
-			player.load_animation('idle_e', spritesheet, [[42,0]], 14, 21, 0);
-			player.load_animation('walk_n', spritesheet, [[0,21],[14,21]], 14, 21, 1);
-			player.load_animation('walk_s', spritesheet, [[28,21],[42,21]], 14, 21, 1);
-			player.load_animation('walk_w', spritesheet, [[56,21],[70,21]], 14, 21, 1);
-			player.load_animation('walk_e', spritesheet, [[84,21],[98,21]], 14, 21, 1);
-			player.x = 32000;
-			player.y = 32000;
-			let data = {
-				type: "player info",
-				data: {width: player.width,
-							 height: player.height}
-			};
-			ws.send(JSON.stringify(data));
+			asset_manager.load_images(img_list, () => {
+				player.load_animation('idle_n', spritesheet, [[0,0]], 14, 21, 0);
+				player.load_animation('idle_s', spritesheet, [[14,0]], 14, 21, 0);
+				player.load_animation('idle_w', spritesheet, [[28,0]], 14, 21, 0);
+				player.load_animation('idle_e', spritesheet, [[42,0]], 14, 21, 0);
+				player.load_animation('walk_n', spritesheet, [[0,21],[14,21]], 14, 21, 1);
+				player.load_animation('walk_s', spritesheet, [[28,21],[42,21]], 14, 21, 1);
+				player.load_animation('walk_w', spritesheet, [[56,21],[70,21]], 14, 21, 1);
+				player.load_animation('walk_e', spritesheet, [[84,21],[98,21]], 14, 21, 1);
+				player.x = 32000;
+				player.y = 32000;
+				let data = {
+					type: "player info",
+					data: {width: player.width,
+								 height: player.height}
+				};
+				ws.send(JSON.stringify(data));
 
-			manager = new GameManager(ctx, names_ctx, gui_ctx, canvas.width,
-																canvas.height, player);
-			manager.gen_around_player();
-			let num_of_hats = hat_data.length;
-			for (let i = 0; i < num_of_hats; i++) {
-				let hat = new StaticObject('hat_'+i);
-				hat.load_sprite(spritesheet[0], hat_data[i][4], hat_data[i][5], hat_data[i][2], hat_data[i][3]);
-				hat.x = hat_data[i][0];
-				hat.y = hat_data[i][1];
-				hat.type = hat_data[i][6];
-				manager.add_static_object(hat);
-			}
-			manager.start();
-		});
+				manager = new GameManager(ctx, names_ctx, gui_ctx, canvas.width,
+																	canvas.height, player);
+				manager.gen_around_player();
+				let num_of_hats = hat_data.length;
+				for (let i = 0; i < num_of_hats; i++) {
+					let hat = new StaticObject('hat_'+i);
+					hat.load_sprite(spritesheet[0], hat_data[i][4], hat_data[i][5], hat_data[i][2], hat_data[i][3]);
+					hat.x = hat_data[i][0];
+					hat.y = hat_data[i][1];
+					hat.type = hat_data[i][6];
+					manager.add_static_object(hat);
+				}
+				manager.start();
+			});
+		}
 
 
 		// click on chat history to hide/unhide
