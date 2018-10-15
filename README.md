@@ -4,7 +4,6 @@ Cappies is a massively multiplayer online game. The vision of our project was to
 
 The game now features a deterministic procedurally generated 2D world with six biomes: sand, water, snow, jungle, swamp, and grass - a chat system for player communication, and randomly generated hats (20 types of hats) with a set rarity (probability) drop for each hat. Hats can be collected and stored in player inventory and worn.
 
-
 ### Folder Organization
 
     .
@@ -22,3 +21,11 @@ The game now features a deterministic procedurally generated 2D world with six b
     ├── routes                  # Routes' files
     ├── test                    # Automated tests
     └── views                   # View template files
+
+### How to start
+
+Once you have cloned the repo, run `npm install` in project root to install project dependencies.
+
+Then run `pip install python_requirements.txt`, followed by `python async_tasks/gen_chunk.py 1600 16 4000` from project root to generate all world chunks.
+
+Lastly, to start the server, use `npm run start`, which runs the start script defined in *package.json*.
